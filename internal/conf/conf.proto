@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package internal.conf;
+
+import "google/protobuf/duration.proto";
+import "config/config.proto";
+import "enum/enum.proto";
+
+option go_package = "github.com/aide-family/sovereign/internal/conf;conf";
+
+message Bootstrap {
+	sovereign.enum.Environment environment = 1;
+	Server server = 2;
+	JWT jwt = 3;
+	sovereign.config.BasicAuthConfig swaggerBasicAuth = 4;
+	sovereign.config.BasicAuthConfig metricsBasicAuth = 5;
+	string enableSwagger = 6;
+	string enableMetrics = 7;
+	string enableClientConfig = 8;
+	sovereign.config.ReportConfig report = 9;
+	sovereign.config.NamespaceConfig namespaceConfig = 10;
+}
+
+message Server {
+	message ServerConfig {
+		string address = 1;
+		string network = 2;
+		google.protobuf.Duration timeout = 3;
+		sovereign.config.ClusterConfig.Protocol protocol = 4;
+	}
+	
+	string name = 1;
+	string namespace = 2;
+	map<string, string> metadata = 3;
+	ServerConfig http = 4;
+	ServerConfig grpc = 5;
+	string useRandomID = 6;
+}
+
+message JWT {
+	string secret = 1;
+	google.protobuf.Duration expire = 2;
+	string issuer = 3;
+}
