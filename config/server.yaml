@@ -28,7 +28,7 @@ jwt:
   issuer: "${MOON_SOVEREIGN_JWT_ISSUER:sovereign}"
 
 namespaceConfig:
-  driver: ${MOON_SOVEREIGN_NAMESPACE_DRIVER:GORM}
+  driver: ${MOON_SOVEREIGN_NAMESPACE_DRIVER:FILE}
   version: ${MOON_SOVEREIGN_NAMESPACE_VERSION:v1}
   options:
     '@type': "${MOON_SOVEREIGN_NAMESPACE_OPTIONS_TYPE:type.googleapis.com/sovereign.config.FileConfig}"
@@ -53,7 +53,7 @@ namespaceConfig:
     #   dsn: "${MOON_SOVEREIGN_NAMESPACE_SQLITE_OPTIONS_DSN:file:./sovereign.db?cache=shared}"
 
 report:
-  reportType: ${MOON_SOVEREIGN_REPORT_TYPE:ETCD}
+  reportType: ${MOON_SOVEREIGN_REPORT_TYPE:REPORT_TYPE_UNKNOWN}
   namespace: ${MOON_SOVEREIGN_REPORT_NAMESPACE:moon}
   options:
     '@type': "${MOON_SOVEREIGN_REPORT_OPTIONS_TYPE:type.googleapis.com/sovereign.config.ETCDOptions}"

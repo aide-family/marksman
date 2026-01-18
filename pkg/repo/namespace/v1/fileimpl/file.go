@@ -114,6 +114,14 @@ func (f *fileRepository) load() error {
 		}
 		return err
 	}
+
+	// 如果解析后为空列表，初始化为空列表
+	if len(namespaces) == 0 {
+		f.namespaces = make([]*model.NamespaceModel, 0)
+		f.nextID = 0
+		return nil
+	}
+
 	sort.Slice(namespaces, func(i, j int) bool {
 		return namespaces[i].ID < namespaces[j].ID
 	})
@@ -372,10 +380,20 @@ func (f *fileRepository) SelectNamespace(ctx context.Context, req *namespacev1.S
 		}
 	}
 
+	var nextUID int64
+	if len(namespaces) > 0 {
+		nextUID = namespaces[len(namespaces)-1].Value
+	}
+
+	limit := int(req.Limit)
+	if limit > len(namespaces) {
+		limit = len(namespaces)
+	}
+
 	return &namespacev1.SelectNamespaceResponse{
-		Items:   namespaces[:req.Limit],
+		Items:   namespaces[:limit],
 		Total:   int64(len(namespaces)),
-		LastUID: namespaces[len(namespaces)-1].Value,
+		LastUID: nextUID,
 		HasMore: count == int(req.Limit),
 	}, nil
 }
