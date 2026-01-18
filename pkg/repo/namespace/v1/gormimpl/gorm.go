@@ -83,7 +83,7 @@ func (g *gormRepository) CreateNamespace(ctx context.Context, req *namespacev1.C
 	namespaceDo := &model.Namespace{
 		Name:     req.Name,
 		Metadata: safety.NewMap(req.Metadata),
-		Status:   uint8(req.Status),
+		Status:   int8(req.Status),
 	}
 	namespaceDo.WithCreator(1)
 	namespaceDo.WithUID(g.node.Generate())
@@ -224,7 +224,7 @@ func (g *gormRepository) UpdateNamespace(ctx context.Context, req *namespacev1.U
 // UpdateNamespaceStatus implements [namespacev1.Repository].
 func (g *gormRepository) UpdateNamespaceStatus(ctx context.Context, req *namespacev1.UpdateNamespaceStatusRequest) (*namespacev1.ResultInfo, error) {
 	mutation := query.Use(g.db)
-	result, err := mutation.Namespace.WithContext(ctx).Where(mutation.Namespace.UID.Eq(req.Uid)).UpdateSimple(mutation.Namespace.Status.Value(uint8(req.Status)))
+result, err := mutation.Namespace.WithContext(ctx).Where(mutation.Namespace.UID.Eq(req.Uid)).UpdateSimple(mutation.Namespace.Status.Value(uint8(req.Status)))
 	if err != nil {
 		return nil, merr.ErrorInternalServer("update namespace status failed: %v", err)
 	}

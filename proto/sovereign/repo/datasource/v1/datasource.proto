@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package repo.datasource.v1;
+
+option go_package = "github.com/aide-family/sovereign/pkg/repo/datasource/v1;datasourcev1";
+
+import "enum/enum.proto";
+
+service DataSourceService {
+    rpc CreateDataSource(CreateDataSourceRequest) returns (DataSourceModel);
+    rpc GetDataSource(GetDataSourceRequest) returns (DataSourceModel);
+    rpc UpdateDataSource(UpdateDataSourceRequest) returns (ResultInfo);
+    rpc DeleteDataSource(DeleteDataSourceRequest) returns (ResultInfo);
+    rpc ListDataSource(ListDataSourceRequest) returns (ListDataSourceResponse);
+    rpc SelectDataSource(SelectDataSourceRequest) returns (SelectDataSourceResponse);
+    rpc UpdateDataSourceStatus(UpdateDataSourceStatusRequest) returns (ResultInfo);
+}
+
+message DataSourceModel {
+    uint32 id = 1;
+    int64 uid = 2;
+    int64 namespaceUid = 3;
+    string type = 4;
+    string engine = 5;
+    string name = 6;
+    sovereign.enum.GlobalStatus status = 7;
+    string endpoint = 8;
+    string description = 9;
+    map<string, string> config = 10;
+    map<string, string> metadata = 11;
+    int64 createdAt = 12;
+    int64 updatedAt = 13;
+    int64 deletedAt = 14;
+    int64 creator = 15;
+}
+
+message DataSourceItemSelect {
+    int64 value = 1;
+    string label = 2;
+    bool disabled = 3;
+    string tooltip = 4;
+}
+
+message CreateDataSourceRequest {
+    int64 namespaceUid = 1;
+    string type = 2;
+    string engine = 3;
+    string name = 4;
+    sovereign.enum.GlobalStatus status = 5;
+    string endpoint = 6;
+    string description = 7;
+    map<string, string> config = 8;
+    map<string, string> metadata = 9;
+}
+
+message GetDataSourceRequest {
+    int64 uid = 1;
+}
+
+message UpdateDataSourceRequest {
+    int64 uid = 1;
+    string name = 2;
+    sovereign.enum.GlobalStatus status = 3;
+    string endpoint = 4;
+    string description = 5;
+    map<string, string> config = 6;
+    map<string, string> metadata = 7;
+}
+
+message ResultInfo {
+    int64 rowsAffected = 1;
+    string error = 2;
+}
+
+message DeleteDataSourceRequest {
+    int64 uid = 1;
+}
+
+enum Order {
+    ASC = 0;
+    DESC = 1;
+}
+
+enum Field {
+    UID = 0;
+    ID = 1;
+    NAMESPACE_UID = 2;
+    TYPE = 3;
+    ENGINE = 4;
+    NAME = 5;
+    STATUS = 6;
+    ENDPOINT = 7;
+    CREATED_AT = 8;
+    UPDATED_AT = 9;
+    DELETED_AT = 10;
+    CREATOR = 11;
+}
+
+message ListDataSourceRequest {
+    int32 page = 1;
+    int32 pageSize = 2;
+    string keyword = 3;
+    sovereign.enum.GlobalStatus status = 4;
+    string type = 5;
+    string engine = 6;
+    int64 namespaceUid = 7;
+    Field orderBy = 8;
+    Order order = 9;
+}
+
+message ListDataSourceResponse {
+    repeated DataSourceModel items = 1;
+    int64 total = 2;
+    int32 page = 3;
+    int32 pageSize = 4;
+}
+
+message SelectDataSourceRequest {
+    string keyword = 1;
+    int32 limit = 2;
+    int64 lastUID = 3;
+    sovereign.enum.GlobalStatus status = 4;
+    string type = 5;
+    string engine = 6;
+    int64 namespaceUid = 7;
+    Order order = 8;
+}
+
+message SelectDataSourceResponse {
+    repeated DataSourceItemSelect items = 1;
+    int64 total = 2;
+    int64 lastUID = 3;
+    bool hasMore = 4;
+}
+
+message UpdateDataSourceStatusRequest {
+    int64 uid = 1;
+    sovereign.enum.GlobalStatus status = 2;
+}

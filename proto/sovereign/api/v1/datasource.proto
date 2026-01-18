@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package sovereign.api.v1;
+
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+import "enum/enum.proto";
+
+option go_package = "github.com/aide-family/sovereign/pkg/api/v1;v1";
+option java_multiple_files = true;
+option java_package = "sovereign.api.v1";
+
+service DataSource {
+	rpc CreateDataSource (CreateDataSourceRequest) returns (CreateDataSourceReply) {
+		option (google.api.http) = {
+			post: "/v1/datasource"
+			body: "*"
+		};
+	}
+	rpc UpdateDataSource (UpdateDataSourceRequest) returns (UpdateDataSourceReply) {
+		option (google.api.http) = {
+			put: "/v1/datasource/{uid}"
+			body: "*"
+		};
+	}
+	rpc UpdateDataSourceStatus (UpdateDataSourceStatusRequest) returns (UpdateDataSourceStatusReply) {
+		option (google.api.http) = {
+			put: "/v1/datasource/{uid}/status"
+			body: "*"
+		};
+	}
+	rpc DeleteDataSource (DeleteDataSourceRequest) returns (DeleteDataSourceReply) {
+		option (google.api.http) = {
+			delete: "/v1/datasource/{uid}"
+		};
+	}
+	rpc GetDataSource (GetDataSourceRequest) returns (DataSourceItem) {
+		option (google.api.http) = {
+			get: "/v1/datasource/{uid}"
+		};
+	}
+	rpc ListDataSource (ListDataSourceRequest) returns (ListDataSourceReply) {
+		option (google.api.http) = {
+			get: "/v1/datasources"
+		};
+	}
+	rpc SelectDataSource (SelectDataSourceRequest) returns (SelectDataSourceReply) {
+		option (google.api.http) = {
+			get: "/v1/datasources/select"
+		};
+	}
+}
+
+message CreateDataSourceRequest {
+	int64 namespaceUid = 1 [(buf.validate.field).required = true];
+	string type = 2 [(buf.validate.field).required = true, (buf.validate.field).string = { min_len: 1, max_len: 50 }];
+	string engine = 3 [(buf.validate.field).required = true, (buf.validate.field).string = { min_len: 1, max_len: 50 }];
+	string name = 4 [(buf.validate.field).required = true, (buf.validate.field).string = { min_len: 1, max_len: 100 }];
+	string endpoint = 5 [(buf.validate.field).required = true, (buf.validate.field).string = { min_len: 1, max_len: 255 }];
+	string description = 6 [(buf.validate.field).string = { max_len: 255 }];
+	map<string, string> config = 7;
+	map<string, string> metadata = 8;
+}
+message CreateDataSourceReply {}
+
+message UpdateDataSourceRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string name = 2 [(buf.validate.field).required = true, (buf.validate.field).string = { min_len: 1, max_len: 100 }];
+	sovereign.enum.GlobalStatus status = 3;
+	string endpoint = 4 [(buf.validate.field).string = { max_len: 255 }];
+	string description = 5 [(buf.validate.field).string = { max_len: 255 }];
+	map<string, string> config = 6;
+	map<string, string> metadata = 7;
+}
+message UpdateDataSourceReply {}
+
+message UpdateDataSourceStatusRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	sovereign.enum.GlobalStatus status = 2 [(buf.validate.field).required = true, (buf.validate.field).cel = {
+		expression: "this in [sovereign.enum.GlobalStatus.ENABLED, sovereign.enum.GlobalStatus.DISABLED]",
+		message: "status must be in ['ENABLED', 'DISABLED']",
+	}];
+}
+message UpdateDataSourceStatusReply {}
+
+message DeleteDataSourceRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+message DeleteDataSourceReply {}
+
+message GetDataSourceRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message ListDataSourceRequest {
+	int32 page = 1 [(buf.validate.field).required = true, (buf.validate.field).cel = {
+		expression: "this >= 1",
+		message: "page must be greater than or equal to 1",
+	}];
+	int32 pageSize = 2 [(buf.validate.field).required = true, (buf.validate.field).cel = {
+		expression: "this >= 1 && this <= 200",
+		message: "pageSize must be greater than or equal to 1 and less than or equal to 200",
+	}];
+	string keyword = 3 [(buf.validate.field).cel = {
+		expression: "this.size() <= 200",
+		message: "keyword must be less than or equal to 200",
+	}];
+	sovereign.enum.GlobalStatus status = 4;
+	string type = 5;
+	string engine = 6;
+	int64 namespaceUid = 7;
+}
+message ListDataSourceReply {
+	int64 total = 1;
+	int32 page = 2;
+	int32 pageSize = 3;
+	repeated DataSourceItem items = 4;
+}
+
+message DataSourceItem {
+	int64 uid = 1;
+	int64 namespaceUid = 2;
+	string type = 3;
+	string engine = 4;
+	string name = 5;
+	sovereign.enum.GlobalStatus status = 6;
+	string endpoint = 7;
+	string description = 8;
+	map<string, string> config = 9;
+	map<string, string> metadata = 10;
+	string createdAt = 11;
+	string updatedAt = 12;
+}
+
+message DataSourceItemSelect {
+	int64 value = 1;
+	string label = 2;
+	bool disabled = 3;
+	string tooltip = 4;
+}
+
+message SelectDataSourceRequest {
+	string keyword = 1 [(buf.validate.field).cel = {
+		expression: "this.size() <= 200",
+		message: "keyword must be less than or equal to 200",
+	}];
+	int32 limit = 2 [(buf.validate.field).required = true, (buf.validate.field).cel = {
+		expression: "this >= 1 && this <= 100",
+		message: "limit must be greater than or equal to 1 and less than or equal to 100",
+	}];
+	int64 lastUID = 3;
+	sovereign.enum.GlobalStatus status = 4;
+	string type = 5;
+	string engine = 6;
+	int64 namespaceUid = 7;
+}
+message SelectDataSourceReply {
+	repeated DataSourceItemSelect items = 1;
+	int64 total = 2;
+	int64 lastUID = 3;
+	bool hasMore = 4;
+}

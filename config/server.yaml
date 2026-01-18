@@ -52,6 +52,15 @@ namespaceConfig:
     #     loc: Asia/Shanghai
     #   dsn: "${MOON_SOVEREIGN_NAMESPACE_SQLITE_OPTIONS_DSN:file:./sovereign.db?cache=shared}"
 
+dataSourceConfig:
+  driver: ${MOON_SOVEREIGN_DATASOURCE_DRIVER:FILE}
+  version: ${MOON_SOVEREIGN_DATASOURCE_VERSION:v1}
+  options:
+    '@type': "${MOON_SOVEREIGN_DATASOURCE_OPTIONS_TYPE:type.googleapis.com/sovereign.config.FileConfig}"
+    path: "${MOON_SOVEREIGN_DATASOURCE_OPTIONS_PATH:./data/datasource}"
+    filename: "${MOON_SOVEREIGN_DATASOURCE_OPTIONS_FILENAME:data_sources.yaml}"
+    storageInterval: "${MOON_SOVEREIGN_DATASOURCE_OPTIONS_STORAGE_INTERVAL:10s}"
+
 report:
   reportType: ${MOON_SOVEREIGN_REPORT_TYPE:REPORT_TYPE_UNKNOWN}
   namespace: ${MOON_SOVEREIGN_REPORT_NAMESPACE:moon}

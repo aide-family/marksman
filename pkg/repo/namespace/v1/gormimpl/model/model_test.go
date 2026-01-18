@@ -9,7 +9,8 @@ import (
 	"gorm.io/gen"
 	"gorm.io/gorm"
 
-	"github.com/aide-family/sovereign/pkg/repo/namespace/v1/gormimpl/model"
+	"github.com/aide-family/sovereign/pkg/repo"
+	"github.com/aide-family/sovereign/pkg/repo/gormmodel"
 )
 
 var genConfig = gen.Config{
@@ -30,6 +31,7 @@ var genConfig = gen.Config{
 }
 
 func generate() {
+	repo.RegisterAllModels()
 	klog.Debugw("msg", "remove all files")
 	os.RemoveAll(genConfig.OutPath)
 	klog.Debugw("msg", "remove all files success", "path", genConfig.OutPath)
@@ -37,12 +39,13 @@ func generate() {
 	g := gen.NewGenerator(genConfig)
 
 	klog.Debugw("msg", "generate code start")
-	g.ApplyBasic(model.Models()...)
+	g.ApplyBasic(gormmodel.Models()...)
 	g.Execute()
 	klog.Debugw("msg", "generate code success")
 }
 
 func migrate() {
+	repo.RegisterAllModels()
 	dsn := "root:123456@tcp(localhost:3306)/sovereign?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
@@ -50,7 +53,7 @@ func migrate() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(model.Models()...)
+	db.AutoMigrate(gormmodel.Models()...)
 }
 
 func TestGenerate(t *testing.T) {
