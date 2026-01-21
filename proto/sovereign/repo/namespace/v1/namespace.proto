@@ -95,14 +95,14 @@ message ListNamespaceResponse {
 message SelectNamespaceRequest {
     string keyword = 1;
     int32 limit = 2;
-    int64 lastUID = 3;
+    int64 nextUID = 3;
     sovereign.enum.GlobalStatus status = 4;
     Order order = 5;
 }
 message SelectNamespaceResponse {
     repeated NamespaceItemSelect items = 1;
     int64 total = 2;
-    int64 lastUID = 3;
+    int64 nextUID = 3;
     bool hasMore = 4;
 }
 

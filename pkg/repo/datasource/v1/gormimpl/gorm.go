@@ -158,11 +158,11 @@ func (g *gormRepository) SelectDataSource(ctx context.Context, req *datasourcev1
 	}
 	query = query.Order(order)
 
-	if req.LastUID > 0 {
+	if req.NextUID > 0 {
 		if req.Order == datasourcev1.Order_DESC {
-			query = query.Where("uid < ?", req.LastUID)
+			query = query.Where("uid < ?", req.NextUID)
 		} else {
-			query = query.Where("uid > ?", req.LastUID)
+			query = query.Where("uid > ?", req.NextUID)
 		}
 	}
 	limit := int(req.Limit)
@@ -181,15 +181,15 @@ func (g *gormRepository) SelectDataSource(ctx context.Context, req *datasourcev1
 		resultItems = append(resultItems, ConvertDataSourceItemSelect(item))
 	}
 
-	lastUID := int64(0)
+	nextUID := int64(0)
 	if len(items) > 0 {
-		lastUID = items[len(items)-1].UID.Int64()
+		nextUID = items[len(items)-1].UID.Int64()
 	}
 
 	return &datasourcev1.SelectDataSourceResponse{
 		Items:   resultItems,
 		Total:   int64(len(resultItems)),
-		LastUID: lastUID,
+		NextUID: nextUID,
 		HasMore: len(items) == limit,
 	}, nil
 }

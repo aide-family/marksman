@@ -171,6 +171,7 @@ func RegisterService(
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
 	dataSourceService *service.DataSourceService,
+	strategyService *service.StrategyService,
 ) Servers {
 	var srvs Servers
 
@@ -178,11 +179,13 @@ func RegisterService(
 		healthService,
 		namespaceService,
 		dataSourceService,
+		strategyService,
 	)...)
 	srvs = append(srvs, RegisterGRPCService(c, grpcSrv,
 		healthService,
 		namespaceService,
 		dataSourceService,
+		strategyService,
 	)...)
 	return srvs
 }
@@ -194,10 +197,12 @@ func RegisterHTTPService(
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
 	dataSourceService *service.DataSourceService,
+	strategyService *service.StrategyService,
 ) Servers {
 	apiv1.RegisterHealthHTTPServer(httpSrv, healthService)
 	apiv1.RegisterNamespaceHTTPServer(httpSrv, namespaceService)
 	apiv1.RegisterDataSourceHTTPServer(httpSrv, dataSourceService)
+	apiv1.RegisterStrategyHTTPServer(httpSrv, strategyService)
 	return Servers{newServer("http", httpSrv)}
 }
 
@@ -208,10 +213,12 @@ func RegisterGRPCService(
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
 	dataSourceService *service.DataSourceService,
+	strategyService *service.StrategyService,
 ) Servers {
 	apiv1.RegisterHealthServer(grpcSrv, healthService)
 	apiv1.RegisterNamespaceServer(grpcSrv, namespaceService)
 	apiv1.RegisterDataSourceServer(grpcSrv, dataSourceService)
+	apiv1.RegisterStrategyServer(grpcSrv, strategyService)
 	return Servers{newServer("grpc", grpcSrv)}
 }
 

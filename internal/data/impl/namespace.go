@@ -1,7 +1,6 @@
 package impl
 
 import (
-	_ "github.com/aide-family/sovereign/pkg/repo/namespace/v1/fileimpl"
 	_ "github.com/aide-family/sovereign/pkg/repo/namespace/v1/gormimpl"
 
 	"context"
@@ -9,9 +8,8 @@ import (
 
 	"github.com/bwmarrin/snowflake"
 
-	"github.com/aide-family/sovereign/internal/biz/bo"
-	"github.com/aide-family/sovereign/internal/biz/repository"
-	"github.com/aide-family/sovereign/internal/biz/vobj"
+	"github.com/aide-family/sovereign/internal/biz/namespace"
+	"github.com/aide-family/sovereign/internal/biz/shared"
 	"github.com/aide-family/sovereign/internal/conf"
 	"github.com/aide-family/sovereign/internal/data"
 	"github.com/aide-family/sovereign/pkg/enum"
@@ -20,7 +18,7 @@ import (
 	namespacev1 "github.com/aide-family/sovereign/pkg/repo/namespace/v1"
 )
 
-func NewNamespaceRepository(c *conf.Bootstrap, d *data.Data) (repository.Namespace, error) {
+func NewNamespaceRepository(c *conf.Bootstrap, d *data.Data) (namespace.Repository, error) {
 	repoConfig := c.GetNamespaceConfig()
 	version := repoConfig.GetVersion()
 	driver := repoConfig.GetDriver()
@@ -43,120 +41,143 @@ type namespaceRepository struct {
 	repo namespacev1.Repository
 }
 
-// CreateNamespace implements [repository.Namespace].
-func (n *namespaceRepository) CreateNamespace(ctx context.Context, req *bo.CreateNamespaceBo) error {
-	_, err := n.repo.CreateNamespace(ctx, &namespacev1.CreateNamespaceRequest{
-		Name:     req.Name,
-		Metadata: req.Metadata,
-		Status:   enum.GlobalStatus(req.Status),
-	})
-	if err != nil {
+// Save implements namespace.Repository.
+func (n *namespaceRepository) Save(ctx context.Context, ns *namespace.Namespace) error {
+	uid := ns.UID().Int64()
+	
+	// 如果 UID 为 0，说明是新实体，直接创建
+	if uid == 0 {
+		_, err := n.repo.CreateNamespace(ctx, &namespacev1.CreateNamespaceRequest{
+			Name:     ns.Name(),
+			Metadata: ns.Metadata(),
+			Status:   enum.GlobalStatus(ns.Status()),
+		})
 		return err
 	}
+
+	// 检查是否存在
+	existing, err := n.repo.GetNamespace(ctx, &namespacev1.GetNamespaceRequest{
+		Uid: uid,
+	})
+	if err != nil {
+		if merr.IsNotFound(err) {
+			// 不存在，创建
+			_, err := n.repo.CreateNamespace(ctx, &namespacev1.CreateNamespaceRequest{
+				Name:     ns.Name(),
+				Metadata: ns.Metadata(),
+				Status:   enum.GlobalStatus(ns.Status()),
+			})
+			return err
+		}
+		return err
+	}
+
+	// 存在，更新
+	if existing != nil {
+		_, err := n.repo.UpdateNamespace(ctx, &namespacev1.UpdateNamespaceRequest{
+			Uid:      uid,
+			Name:     ns.Name(),
+			Metadata: ns.Metadata(),
+		})
+		return err
+	}
+
 	return nil
 }
 
-// DeleteNamespace implements [repository.Namespace].
-func (n *namespaceRepository) DeleteNamespace(ctx context.Context, uid snowflake.ID) error {
-	_, err := n.repo.DeleteNamespace(ctx, &namespacev1.DeleteNamespaceRequest{
-		Uid: uid.Int64(),
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// GetNamespace implements [repository.Namespace].
-func (n *namespaceRepository) GetNamespace(ctx context.Context, uid snowflake.ID) (*bo.NamespaceItemBo, error) {
-	namespaceModel, err := n.repo.GetNamespace(ctx, &namespacev1.GetNamespaceRequest{
+// FindByID implements namespace.Repository.
+func (n *namespaceRepository) FindByID(ctx context.Context, uid snowflake.ID) (*namespace.Namespace, error) {
+	model, err := n.repo.GetNamespace(ctx, &namespacev1.GetNamespaceRequest{
 		Uid: uid.Int64(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	return parseNamespaceModel(namespaceModel), nil
+	return toNamespaceEntity(model), nil
 }
 
-// GetNamespaceByName implements [repository.Namespace].
-func (n *namespaceRepository) GetNamespaceByName(ctx context.Context, name string) (*bo.NamespaceItemBo, error) {
-	namespaceModel, err := n.repo.GetNamespaceByName(ctx, &namespacev1.GetNamespaceByNameRequest{
+// FindByName implements namespace.Repository.
+func (n *namespaceRepository) FindByName(ctx context.Context, name string) (*namespace.Namespace, error) {
+	model, err := n.repo.GetNamespaceByName(ctx, &namespacev1.GetNamespaceByNameRequest{
 		Name: name,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return parseNamespaceModel(namespaceModel), nil
+	return toNamespaceEntity(model), nil
 }
 
-// ListNamespace implements [repository.Namespace].
-func (n *namespaceRepository) ListNamespace(ctx context.Context, req *bo.ListNamespaceBo) (*bo.PageResponseBo[*bo.NamespaceItemBo], error) {
-	listNamespaceResponse, err := n.repo.ListNamespace(ctx, &namespacev1.ListNamespaceRequest{
-		Page:     req.Page,
-		PageSize: req.PageSize,
-		Keyword:  req.Keyword,
-		Status:   enum.GlobalStatus(req.Status),
+// Delete implements namespace.Repository.
+func (n *namespaceRepository) Delete(ctx context.Context, uid snowflake.ID) error {
+	_, err := n.repo.DeleteNamespace(ctx, &namespacev1.DeleteNamespaceRequest{
+		Uid: uid.Int64(),
 	})
+	return err
+}
+
+// List implements namespace.Repository.
+func (n *namespaceRepository) List(ctx context.Context, query *namespace.ListQuery) (*shared.Page[*namespace.Namespace], error) {
+	req := &namespacev1.ListNamespaceRequest{
+		Page:     query.Page,
+		PageSize: query.PageSize,
+		Keyword:  query.Keyword,
+		Status:   enum.GlobalStatus(query.Status),
+	}
+
+	resp, err := n.repo.ListNamespace(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	items := make([]*bo.NamespaceItemBo, 0, len(listNamespaceResponse.Namespaces))
-	for _, namespaceModel := range listNamespaceResponse.Namespaces {
-		items = append(items, parseNamespaceModel(namespaceModel))
+
+	items := make([]*namespace.Namespace, 0, len(resp.Namespaces))
+	for _, model := range resp.Namespaces {
+		items = append(items, toNamespaceEntity(model))
 	}
-	req.WithTotal(listNamespaceResponse.Total)
-	return bo.NewPageResponseBo(req.PageRequestBo, items), nil
+
+	query.WithTotal(resp.Total)
+	return shared.NewPage(query.PageRequest, items), nil
 }
 
-// SelectNamespace implements [repository.Namespace].
-func (n *namespaceRepository) SelectNamespace(ctx context.Context, req *bo.SelectNamespaceBo) (*bo.SelectNamespaceBoResult, error) {
-	selectNamespaceResponse, err := n.repo.SelectNamespace(ctx, &namespacev1.SelectNamespaceRequest{
-		Keyword: req.Keyword,
-		Limit:   req.Limit,
-		LastUID: req.LastUID.Int64(),
-		Status:  enum.GlobalStatus(req.Status),
-	})
+// Select implements namespace.Repository.
+func (n *namespaceRepository) Select(ctx context.Context, query *namespace.SelectQuery) (*namespace.SelectResult, error) {
+	req := &namespacev1.SelectNamespaceRequest{
+		Keyword: query.Keyword,
+		Limit:   query.Limit,
+		NextUID: query.NextUID.Int64(),
+		Status:  enum.GlobalStatus(query.Status),
+	}
+
+	resp, err := n.repo.SelectNamespace(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	items := make([]*bo.NamespaceItemSelectBo, 0, len(selectNamespaceResponse.Items))
-	for _, namespaceItemSelect := range selectNamespaceResponse.Items {
-		items = append(items, parseNamespaceItemSelect(namespaceItemSelect))
+
+	items := make([]*namespace.SelectItem, 0, len(resp.Items))
+	for _, item := range resp.Items {
+		items = append(items, &namespace.SelectItem{
+			UID:      snowflake.ParseInt64(item.Value),
+			Name:     item.Label,
+			Disabled: item.Disabled,
+			Tooltip:  item.Tooltip,
+		})
 	}
-	return &bo.SelectNamespaceBoResult{
+
+	return &namespace.SelectResult{
 		Items:   items,
-		Total:   selectNamespaceResponse.Total,
-		LastUID: snowflake.ParseInt64(selectNamespaceResponse.LastUID),
-		HasMore: selectNamespaceResponse.HasMore,
+		Total:   resp.Total,
+		NextUID: snowflake.ParseInt64(resp.NextUID),
+		HasMore: resp.HasMore,
 	}, nil
 }
 
-// UpdateNamespace implements [repository.Namespace].
-func (n *namespaceRepository) UpdateNamespace(ctx context.Context, req *bo.UpdateNamespaceBo) error {
-	panic("unimplemented")
-}
-
-// UpdateNamespaceStatus implements [repository.Namespace].
-func (n *namespaceRepository) UpdateNamespaceStatus(ctx context.Context, req *bo.UpdateNamespaceStatusBo) error {
-	panic("unimplemented")
-}
-
-func parseNamespaceModel(namespaceModel *namespacev1.NamespaceModel) *bo.NamespaceItemBo {
-	return &bo.NamespaceItemBo{
-		UID:       snowflake.ParseInt64(namespaceModel.Uid),
-		Name:      namespaceModel.Name,
-		Metadata:  namespaceModel.Metadata,
-		Status:    vobj.GlobalStatus(namespaceModel.Status),
-		CreatedAt: time.Unix(namespaceModel.CreatedAt, 0),
-		UpdatedAt: time.Unix(namespaceModel.UpdatedAt, 0),
-	}
-}
-
-func parseNamespaceItemSelect(namespaceItemSelect *namespacev1.NamespaceItemSelect) *bo.NamespaceItemSelectBo {
-	return &bo.NamespaceItemSelectBo{
-		UID:      snowflake.ParseInt64(namespaceItemSelect.Value),
-		Name:     namespaceItemSelect.Label,
-		Disabled: namespaceItemSelect.Disabled,
-		Tooltip:  namespaceItemSelect.Tooltip,
-	}
+// toNamespaceEntity converts repo model to domain entity
+func toNamespaceEntity(model *namespacev1.NamespaceModel) *namespace.Namespace {
+	return namespace.FromModel(
+		snowflake.ParseInt64(model.Uid),
+		model.Name,
+		model.Metadata,
+		namespace.Status(model.Status),
+		time.Unix(model.CreatedAt, 0),
+		time.Unix(model.UpdatedAt, 0),
+	)
 }

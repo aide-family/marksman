@@ -24,6 +24,7 @@ const OperationDataSourceDeleteDataSource = "/sovereign.api.v1.DataSource/Delete
 const OperationDataSourceGetDataSource = "/sovereign.api.v1.DataSource/GetDataSource"
 const OperationDataSourceListDataSource = "/sovereign.api.v1.DataSource/ListDataSource"
 const OperationDataSourceSelectDataSource = "/sovereign.api.v1.DataSource/SelectDataSource"
+const OperationDataSourceTestConnection = "/sovereign.api.v1.DataSource/TestConnection"
 const OperationDataSourceUpdateDataSource = "/sovereign.api.v1.DataSource/UpdateDataSource"
 const OperationDataSourceUpdateDataSourceStatus = "/sovereign.api.v1.DataSource/UpdateDataSourceStatus"
 
@@ -33,6 +34,7 @@ type DataSourceHTTPServer interface {
 	GetDataSource(context.Context, *GetDataSourceRequest) (*DataSourceItem, error)
 	ListDataSource(context.Context, *ListDataSourceRequest) (*ListDataSourceReply, error)
 	SelectDataSource(context.Context, *SelectDataSourceRequest) (*SelectDataSourceReply, error)
+	TestConnection(context.Context, *TestConnectionRequest) (*TestConnectionReply, error)
 	UpdateDataSource(context.Context, *UpdateDataSourceRequest) (*UpdateDataSourceReply, error)
 	UpdateDataSourceStatus(context.Context, *UpdateDataSourceStatusRequest) (*UpdateDataSourceStatusReply, error)
 }
@@ -46,6 +48,7 @@ func RegisterDataSourceHTTPServer(s *http.Server, srv DataSourceHTTPServer) {
 	r.GET("/v1/datasource/{uid}", _DataSource_GetDataSource0_HTTP_Handler(srv))
 	r.GET("/v1/datasources", _DataSource_ListDataSource0_HTTP_Handler(srv))
 	r.GET("/v1/datasources/select", _DataSource_SelectDataSource0_HTTP_Handler(srv))
+	r.POST("/v1/datasource/{uid}/test", _DataSource_TestConnection0_HTTP_Handler(srv))
 }
 
 func _DataSource_CreateDataSource0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
@@ -202,12 +205,35 @@ func _DataSource_SelectDataSource0_HTTP_Handler(srv DataSourceHTTPServer) func(c
 	}
 }
 
+func _DataSource_TestConnection0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in TestConnectionRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceTestConnection)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.TestConnection(ctx, req.(*TestConnectionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*TestConnectionReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type DataSourceHTTPClient interface {
 	CreateDataSource(ctx context.Context, req *CreateDataSourceRequest, opts ...http.CallOption) (rsp *CreateDataSourceReply, err error)
 	DeleteDataSource(ctx context.Context, req *DeleteDataSourceRequest, opts ...http.CallOption) (rsp *DeleteDataSourceReply, err error)
 	GetDataSource(ctx context.Context, req *GetDataSourceRequest, opts ...http.CallOption) (rsp *DataSourceItem, err error)
 	ListDataSource(ctx context.Context, req *ListDataSourceRequest, opts ...http.CallOption) (rsp *ListDataSourceReply, err error)
 	SelectDataSource(ctx context.Context, req *SelectDataSourceRequest, opts ...http.CallOption) (rsp *SelectDataSourceReply, err error)
+	TestConnection(ctx context.Context, req *TestConnectionRequest, opts ...http.CallOption) (rsp *TestConnectionReply, err error)
 	UpdateDataSource(ctx context.Context, req *UpdateDataSourceRequest, opts ...http.CallOption) (rsp *UpdateDataSourceReply, err error)
 	UpdateDataSourceStatus(ctx context.Context, req *UpdateDataSourceStatusRequest, opts ...http.CallOption) (rsp *UpdateDataSourceStatusReply, err error)
 }
@@ -279,6 +305,19 @@ func (c *DataSourceHTTPClientImpl) SelectDataSource(ctx context.Context, in *Sel
 	opts = append(opts, http.Operation(OperationDataSourceSelectDataSource))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) TestConnection(ctx context.Context, in *TestConnectionRequest, opts ...http.CallOption) (*TestConnectionReply, error) {
+	var out TestConnectionReply
+	pattern := "/v1/datasource/{uid}/test"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceTestConnection))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

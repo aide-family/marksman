@@ -26,6 +26,7 @@ const (
 	DataSource_GetDataSource_FullMethodName          = "/sovereign.api.v1.DataSource/GetDataSource"
 	DataSource_ListDataSource_FullMethodName         = "/sovereign.api.v1.DataSource/ListDataSource"
 	DataSource_SelectDataSource_FullMethodName       = "/sovereign.api.v1.DataSource/SelectDataSource"
+	DataSource_TestConnection_FullMethodName         = "/sovereign.api.v1.DataSource/TestConnection"
 )
 
 // DataSourceClient is the client API for DataSource service.
@@ -39,6 +40,7 @@ type DataSourceClient interface {
 	GetDataSource(ctx context.Context, in *GetDataSourceRequest, opts ...grpc.CallOption) (*DataSourceItem, error)
 	ListDataSource(ctx context.Context, in *ListDataSourceRequest, opts ...grpc.CallOption) (*ListDataSourceReply, error)
 	SelectDataSource(ctx context.Context, in *SelectDataSourceRequest, opts ...grpc.CallOption) (*SelectDataSourceReply, error)
+	TestConnection(ctx context.Context, in *TestConnectionRequest, opts ...grpc.CallOption) (*TestConnectionReply, error)
 }
 
 type dataSourceClient struct {
@@ -119,6 +121,16 @@ func (c *dataSourceClient) SelectDataSource(ctx context.Context, in *SelectDataS
 	return out, nil
 }
 
+func (c *dataSourceClient) TestConnection(ctx context.Context, in *TestConnectionRequest, opts ...grpc.CallOption) (*TestConnectionReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TestConnectionReply)
+	err := c.cc.Invoke(ctx, DataSource_TestConnection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DataSourceServer is the server API for DataSource service.
 // All implementations must embed UnimplementedDataSourceServer
 // for forward compatibility.
@@ -130,6 +142,7 @@ type DataSourceServer interface {
 	GetDataSource(context.Context, *GetDataSourceRequest) (*DataSourceItem, error)
 	ListDataSource(context.Context, *ListDataSourceRequest) (*ListDataSourceReply, error)
 	SelectDataSource(context.Context, *SelectDataSourceRequest) (*SelectDataSourceReply, error)
+	TestConnection(context.Context, *TestConnectionRequest) (*TestConnectionReply, error)
 	mustEmbedUnimplementedDataSourceServer()
 }
 
@@ -160,6 +173,9 @@ func (UnimplementedDataSourceServer) ListDataSource(context.Context, *ListDataSo
 }
 func (UnimplementedDataSourceServer) SelectDataSource(context.Context, *SelectDataSourceRequest) (*SelectDataSourceReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SelectDataSource not implemented")
+}
+func (UnimplementedDataSourceServer) TestConnection(context.Context, *TestConnectionRequest) (*TestConnectionReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TestConnection not implemented")
 }
 func (UnimplementedDataSourceServer) mustEmbedUnimplementedDataSourceServer() {}
 func (UnimplementedDataSourceServer) testEmbeddedByValue()                    {}
@@ -308,6 +324,24 @@ func _DataSource_SelectDataSource_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataSource_TestConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TestConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataSourceServer).TestConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataSource_TestConnection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataSourceServer).TestConnection(ctx, req.(*TestConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DataSource_ServiceDesc is the grpc.ServiceDesc for DataSource service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -342,6 +376,10 @@ var DataSource_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SelectDataSource",
 			Handler:    _DataSource_SelectDataSource_Handler,
+		},
+		{
+			MethodName: "TestConnection",
+			Handler:    _DataSource_TestConnection_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

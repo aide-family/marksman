@@ -140,7 +140,7 @@ func ToAPIV1ListDataSourceReply(pageResponseBo *PageResponseBo[*DataSourceItemBo
 type SelectDataSourceBo struct {
 	Keyword      string
 	Limit        int32
-	LastUID      snowflake.ID
+	NextUID      snowflake.ID
 	Status       vobj.GlobalStatus
 	Type         string
 	Engine       string
@@ -149,14 +149,14 @@ type SelectDataSourceBo struct {
 }
 
 func NewSelectDataSourceBo(req *apiv1.SelectDataSourceRequest) *SelectDataSourceBo {
-	var lastUID snowflake.ID
-	if req.LastUID > 0 {
-		lastUID = snowflake.ParseInt64(req.LastUID)
+	var nextUID snowflake.ID
+	if req.NextUID > 0 {
+		nextUID = snowflake.ParseInt64(req.NextUID)
 	}
 	return &SelectDataSourceBo{
 		Keyword:      req.Keyword,
 		Limit:        req.Limit,
-		LastUID:      lastUID,
+		NextUID:      nextUID,
 		Status:       vobj.GlobalStatus(req.Status),
 		Type:         req.Type,
 		Engine:       req.Engine,
@@ -183,7 +183,7 @@ func (b *DataSourceItemSelectBo) ToAPIV1DataSourceItemSelect() *apiv1.DataSource
 type SelectDataSourceBoResult struct {
 	Items   []*DataSourceItemSelectBo
 	Total   int64
-	LastUID snowflake.ID
+	NextUID snowflake.ID
 	HasMore bool
 }
 
@@ -195,7 +195,7 @@ func ToAPIV1SelectDataSourceReply(result *SelectDataSourceBoResult) *apiv1.Selec
 	return &apiv1.SelectDataSourceReply{
 		Items:   selectItems,
 		Total:   result.Total,
-		LastUID: result.LastUID.Int64(),
+		NextUID: result.NextUID.Int64(),
 		HasMore: result.HasMore,
 	}
 }

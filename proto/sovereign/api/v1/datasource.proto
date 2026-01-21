@@ -49,6 +49,11 @@ service DataSource {
 			get: "/v1/datasources/select"
 		};
 	}
+	rpc TestConnection (TestConnectionRequest) returns (TestConnectionReply) {
+		option (google.api.http) = {
+			post: "/v1/datasource/{uid}/test"
+		};
+	}
 }
 
 message CreateDataSourceRequest {
@@ -148,7 +153,7 @@ message SelectDataSourceRequest {
 		expression: "this >= 1 && this <= 100",
 		message: "limit must be greater than or equal to 1 and less than or equal to 100",
 	}];
-	int64 lastUID = 3;
+	int64 nextUID = 3;
 	sovereign.enum.GlobalStatus status = 4;
 	string type = 5;
 	string engine = 6;
@@ -157,6 +162,15 @@ message SelectDataSourceRequest {
 message SelectDataSourceReply {
 	repeated DataSourceItemSelect items = 1;
 	int64 total = 2;
-	int64 lastUID = 3;
+	int64 nextUID = 3;
 	bool hasMore = 4;
+}
+
+message TestConnectionRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message TestConnectionReply {
+	bool success = 1;
+	string message = 2;
 }

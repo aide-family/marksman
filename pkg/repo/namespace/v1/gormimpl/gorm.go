@@ -185,12 +185,12 @@ func (g *gormRepository) SelectNamespace(ctx context.Context, req *namespacev1.S
 	case namespacev1.Order_ASC:
 		wrappers = wrappers.Order(mutation.UID.Asc())
 	}
-	if req.LastUID > 0 {
+	if req.NextUID > 0 {
 		switch req.Order {
 		case namespacev1.Order_DESC:
-			wrappers = wrappers.Where(mutation.UID.Lt(req.LastUID))
+			wrappers = wrappers.Where(mutation.UID.Lt(req.NextUID))
 		case namespacev1.Order_ASC:
-			wrappers = wrappers.Where(mutation.UID.Gt(req.LastUID))
+			wrappers = wrappers.Where(mutation.UID.Gt(req.NextUID))
 		}
 	}
 	wrappers = wrappers.Select(mutation.UID, mutation.Name, mutation.Status, mutation.DeletedAt)
@@ -205,7 +205,7 @@ func (g *gormRepository) SelectNamespace(ctx context.Context, req *namespacev1.S
 	return &namespacev1.SelectNamespaceResponse{
 		Items:   namespaces,
 		Total:   int64(len(namespaces)),
-		LastUID: queryNamespaces[len(queryNamespaces)-1].UID.Int64(),
+		NextUID: queryNamespaces[len(queryNamespaces)-1].UID.Int64(),
 		HasMore: len(queryNamespaces) == int(req.Limit),
 	}, nil
 }

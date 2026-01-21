@@ -118,6 +118,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/sovereign.api.v1.UpdateDataSourceStatusReply'
+    /v1/datasource/{uid}/test:
+        post:
+            tags:
+                - DataSource
+            operationId: DataSource_TestConnection
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.TestConnectionReply'
     /v1/datasources:
         get:
             tags:
@@ -552,6 +570,13 @@ components:
                     type: string
                 hasMore:
                     type: boolean
+        sovereign.api.v1.TestConnectionReply:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                message:
+                    type: string
         sovereign.api.v1.UpdateDataSourceReply:
             type: object
             properties: {}

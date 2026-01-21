@@ -101,20 +101,20 @@ func ToAPIV1ListNamespaceReply(pageResponseBo *PageResponseBo[*NamespaceItemBo])
 type SelectNamespaceBo struct {
 	Keyword string
 	Limit   int32
-	LastUID snowflake.ID
+	NextUID snowflake.ID
 	Status  vobj.GlobalStatus
 }
 
 // NewSelectNamespaceBo 从 API 请求创建 BO
 func NewSelectNamespaceBo(req *apiv1.SelectNamespaceRequest) *SelectNamespaceBo {
-	var lastUID snowflake.ID
-	if req.LastUID > 0 {
-		lastUID = snowflake.ParseInt64(req.LastUID)
+	var nextUID snowflake.ID
+	if req.NextUID > 0 {
+		nextUID = snowflake.ParseInt64(req.NextUID)
 	}
 	return &SelectNamespaceBo{
 		Keyword: req.Keyword,
 		Limit:   req.Limit,
-		LastUID: lastUID,
+		NextUID: nextUID,
 		Status:  vobj.GlobalStatus(req.Status),
 	}
 }
@@ -142,7 +142,7 @@ func (b *NamespaceItemSelectBo) ToAPIV1NamespaceItemSelect() *apiv1.NamespaceIte
 type SelectNamespaceBoResult struct {
 	Items   []*NamespaceItemSelectBo
 	Total   int64
-	LastUID snowflake.ID
+	NextUID snowflake.ID
 	HasMore bool
 }
 
@@ -156,7 +156,7 @@ func ToAPIV1SelectNamespaceReply(result *SelectNamespaceBoResult) *apiv1.SelectN
 	return &apiv1.SelectNamespaceReply{
 		Items:   selectItems,
 		Total:   result.Total,
-		LastUID: result.LastUID.Int64(),
+		NextUID: result.NextUID.Int64(),
 		HasMore: result.HasMore,
 	}
 }

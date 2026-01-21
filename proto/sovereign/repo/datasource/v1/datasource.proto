@@ -118,7 +118,7 @@ message ListDataSourceResponse {
 message SelectDataSourceRequest {
     string keyword = 1;
     int32 limit = 2;
-    int64 lastUID = 3;
+    int64 nextUID = 3;
     sovereign.enum.GlobalStatus status = 4;
     string type = 5;
     string engine = 6;
@@ -129,7 +129,7 @@ message SelectDataSourceRequest {
 message SelectDataSourceResponse {
     repeated DataSourceItemSelect items = 1;
     int64 total = 2;
-    int64 lastUID = 3;
+    int64 nextUID = 3;
     bool hasMore = 4;
 }
 
