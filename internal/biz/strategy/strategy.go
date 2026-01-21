@@ -104,6 +104,56 @@ func (s *Strategy) UpdateMetadata(metadata map[string]string) {
 	s.updatedAt = time.Now()
 }
 
+func (s *Strategy) UpdateDataSourceUIDs(uids map[snowflake.ID]bool) {
+	s.dataSourceUIDs = uids
+	s.updatedAt = time.Now()
+}
+
+func (s *Strategy) UpdateQuery(query string) {
+	s.query = query
+	s.updatedAt = time.Now()
+}
+
+func (s *Strategy) UpdateDataSourceType(dataSourceType string) {
+	s.dataSourceType = dataSourceType
+	s.updatedAt = time.Now()
+}
+
+func (s *Strategy) UpdateAlertTitle(title string) {
+	s.alertTitle = title
+	s.updatedAt = time.Now()
+}
+
+func (s *Strategy) UpdateAlertContent(content string) {
+	s.alertContent = content
+	s.updatedAt = time.Now()
+}
+
+func (s *Strategy) UpdateAlertPages(pages []string) {
+	s.alertPages = pages
+	s.updatedAt = time.Now()
+}
+
+func (s *Strategy) UpdateDialTestType(dialTestType vobj.DialTestType) {
+	s.dialTestType = dialTestType
+	s.updatedAt = time.Now()
+}
+
+func (s *Strategy) UpdateDialTestTargets(targets map[string]string) {
+	s.dialTestTargets = targets
+	s.updatedAt = time.Now()
+}
+
+func (s *Strategy) UpdateSuppressType(suppressType string) {
+	s.suppressType = suppressType
+	s.updatedAt = time.Now()
+}
+
+func (s *Strategy) UpdateSuppressConfig(config string) {
+	s.suppressConfig = config
+	s.updatedAt = time.Now()
+}
+
 // FromModel creates a Strategy entity from repository model
 func FromModel(uid, namespaceUID, groupUID snowflake.ID, typ vobj.StrategyType, name, description string, status vobj.GlobalStatus, dataSourceUIDs map[snowflake.ID]bool, query, dataSourceType string, dialTestType vobj.DialTestType, dialTestTargets map[string]string, suppressType, suppressConfig, alertTitle, alertContent string, alertLevel vobj.AlertLevel, alertPages []string, rules string, labels, metadata map[string]string, createdAt, updatedAt time.Time) *Strategy {
 	return &Strategy{

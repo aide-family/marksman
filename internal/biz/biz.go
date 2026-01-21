@@ -6,6 +6,7 @@ import (
 	"github.com/aide-family/sovereign/internal/biz/datasource"
 	"github.com/aide-family/sovereign/internal/biz/namespace"
 	"github.com/aide-family/sovereign/internal/biz/strategy"
+	"github.com/aide-family/sovereign/internal/biz/subscription"
 )
 
 var ProviderSetBiz = wire.NewSet(
@@ -16,4 +17,6 @@ var ProviderSetBiz = wire.NewSet(
 	datasource.NewValidator,
 	strategy.NewService,
 	strategy.NewValidator,
+	subscription.NewService,
+	subscription.NewValidator,
 )

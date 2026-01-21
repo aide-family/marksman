@@ -247,3 +247,193 @@ func toAPIV1ListStrategyGroupReply(page *shared.Page[*strategy.StrategyGroup]) *
 	}
 }
 
+// 策略组升级模式更新接口实现
+func (s *StrategyService) UpdateStrategyGroupUpgradeMode(ctx context.Context, req *apiv1.UpdateStrategyGroupUpgradeModeRequest) (*apiv1.UpdateStrategyGroupUpgradeModeReply, error) {
+	if err := s.strategyService.UpdateGroupUpgradeMode(ctx, snowflake.ParseInt64(req.Uid), vobj.UpgradeMode(req.UpgradeMode)); err != nil {
+		return nil, err
+	}
+	return &apiv1.UpdateStrategyGroupUpgradeModeReply{}, nil
+}
+
+func (s *StrategyService) UpdateStrategyGroupUpgradeConfig(ctx context.Context, req *apiv1.UpdateStrategyGroupUpgradeConfigRequest) (*apiv1.UpdateStrategyGroupUpgradeConfigReply, error) {
+	if err := s.strategyService.UpdateGroupUpgradeConfig(ctx, snowflake.ParseInt64(req.Uid), req.UpgradeConfig); err != nil {
+		return nil, err
+	}
+	return &apiv1.UpdateStrategyGroupUpgradeConfigReply{}, nil
+}
+
+// 接收对象相关接口实现
+func (s *StrategyService) CreateReceiver(ctx context.Context, req *apiv1.CreateReceiverRequest) (*apiv1.CreateReceiverReply, error) {
+	userIDs := make(map[snowflake.ID]bool)
+	for _, uid := range req.UserIds {
+		userIDs[snowflake.ParseInt64(uid)] = true
+	}
+	notifyTypes := make([]vobj.NotifyType, 0, len(req.NotifyTypes))
+	for _, t := range req.NotifyTypes {
+		notifyTypes = append(notifyTypes, vobj.NotifyType(t))
+	}
+	if err := s.strategyService.CreateReceiver(ctx, snowflake.ParseInt64(req.NamespaceUid), vobj.ReceiverType(req.Type), req.Name, req.Description, userIDs, req.LabelMatch, notifyTypes); err != nil {
+		return nil, err
+	}
+	return &apiv1.CreateReceiverReply{}, nil
+}
+
+func (s *StrategyService) UpdateReceiver(ctx context.Context, req *apiv1.UpdateReceiverRequest) (*apiv1.UpdateReceiverReply, error) {
+	userIDs := make(map[snowflake.ID]bool)
+	for _, uid := range req.UserIds {
+		userIDs[snowflake.ParseInt64(uid)] = true
+	}
+	notifyTypes := make([]vobj.NotifyType, 0, len(req.NotifyTypes))
+	for _, t := range req.NotifyTypes {
+		notifyTypes = append(notifyTypes, vobj.NotifyType(t))
+	}
+	if err := s.strategyService.UpdateReceiver(ctx, snowflake.ParseInt64(req.Uid), req.Name, req.Description, userIDs, req.LabelMatch, notifyTypes); err != nil {
+		return nil, err
+	}
+	return &apiv1.UpdateReceiverReply{}, nil
+}
+
+func (s *StrategyService) DeleteReceiver(ctx context.Context, req *apiv1.DeleteReceiverRequest) (*apiv1.DeleteReceiverReply, error) {
+	if err := s.strategyService.DeleteReceiver(ctx, snowflake.ParseInt64(req.Uid)); err != nil {
+		return nil, err
+	}
+	return &apiv1.DeleteReceiverReply{}, nil
+}
+
+func (s *StrategyService) GetReceiver(ctx context.Context, req *apiv1.GetReceiverRequest) (*apiv1.ReceiverItem, error) {
+	receiver, err := s.strategyService.GetReceiver(ctx, snowflake.ParseInt64(req.Uid))
+	if err != nil {
+		return nil, err
+	}
+	return toAPIV1ReceiverItem(receiver), nil
+}
+
+func (s *StrategyService) ListReceiver(ctx context.Context, req *apiv1.ListReceiverRequest) (*apiv1.ListReceiverReply, error) {
+	query := &strategy.ReceiverListQuery{
+		PageRequest:  shared.NewPageRequest(req.Page, req.PageSize),
+		NamespaceUID: snowflake.ParseInt64(req.NamespaceUid),
+		Type:         vobj.ReceiverType(req.Type),
+		Keyword:      req.Keyword,
+	}
+	page, err := s.strategyService.ListReceivers(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	return toAPIV1ListReceiverReply(page), nil
+}
+
+// 策略规则相关接口实现（占位实现，需要后续完善 biz 层）
+func (s *StrategyService) CreateStrategyRule(ctx context.Context, req *apiv1.CreateStrategyRuleRequest) (*apiv1.CreateStrategyRuleReply, error) {
+	// TODO: 实现创建策略规则逻辑
+	return &apiv1.CreateStrategyRuleReply{}, nil
+}
+
+func (s *StrategyService) UpdateStrategyRule(ctx context.Context, req *apiv1.UpdateStrategyRuleRequest) (*apiv1.UpdateStrategyRuleReply, error) {
+	// TODO: 实现更新策略规则逻辑
+	return &apiv1.UpdateStrategyRuleReply{}, nil
+}
+
+func (s *StrategyService) DeleteStrategyRule(ctx context.Context, req *apiv1.DeleteStrategyRuleRequest) (*apiv1.DeleteStrategyRuleReply, error) {
+	// TODO: 实现删除策略规则逻辑
+	return &apiv1.DeleteStrategyRuleReply{}, nil
+}
+
+func (s *StrategyService) GetStrategyRule(ctx context.Context, req *apiv1.GetStrategyRuleRequest) (*apiv1.StrategyRuleItem, error) {
+	// TODO: 实现获取策略规则逻辑
+	return &apiv1.StrategyRuleItem{}, nil
+}
+
+func (s *StrategyService) ListStrategyRule(ctx context.Context, req *apiv1.ListStrategyRuleRequest) (*apiv1.ListStrategyRuleReply, error) {
+	// TODO: 实现列表查询策略规则逻辑
+	return &apiv1.ListStrategyRuleReply{
+		Rules: []*apiv1.StrategyRuleItem{},
+	}, nil
+}
+
+func (s *StrategyService) UpdateStrategyRuleStatus(ctx context.Context, req *apiv1.UpdateStrategyRuleStatusRequest) (*apiv1.UpdateStrategyRuleStatusReply, error) {
+	// TODO: 实现更新策略规则状态逻辑
+	return &apiv1.UpdateStrategyRuleStatusReply{}, nil
+}
+
+// 策略详细配置更新接口实现
+func (s *StrategyService) UpdateStrategyDataSourceConfig(ctx context.Context, req *apiv1.UpdateStrategyDataSourceConfigRequest) (*apiv1.UpdateStrategyDataSourceConfigReply, error) {
+	uids := make(map[snowflake.ID]bool)
+	for _, uid := range req.DatasourceUids {
+		uids[snowflake.ParseInt64(uid)] = true
+	}
+	if err := s.strategyService.UpdateDataSourceConfig(ctx, snowflake.ParseInt64(req.Uid), uids, req.Query, req.DatasourceType); err != nil {
+		return nil, err
+	}
+	return &apiv1.UpdateStrategyDataSourceConfigReply{}, nil
+}
+
+func (s *StrategyService) UpdateStrategyAlertConfig(ctx context.Context, req *apiv1.UpdateStrategyAlertConfigRequest) (*apiv1.UpdateStrategyAlertConfigReply, error) {
+	alertPages := make([]string, 0, len(req.AlertPages))
+	alertPages = append(alertPages, req.AlertPages...)
+	if err := s.strategyService.UpdateAlertConfig(ctx, snowflake.ParseInt64(req.Uid), req.AlertTitle, req.AlertContent, vobj.AlertLevel(req.AlertLevel), alertPages); err != nil {
+		return nil, err
+	}
+	return &apiv1.UpdateStrategyAlertConfigReply{}, nil
+}
+
+func (s *StrategyService) UpdateStrategyNotifyConfig(ctx context.Context, req *apiv1.UpdateStrategyNotifyConfigRequest) (*apiv1.UpdateStrategyNotifyConfigReply, error) {
+	uids := make(map[snowflake.ID]bool)
+	for _, uid := range req.ReceiverUids {
+		uids[snowflake.ParseInt64(uid)] = true
+	}
+	if err := s.strategyService.UpdateNotifyConfig(ctx, snowflake.ParseInt64(req.Uid), uids); err != nil {
+		return nil, err
+	}
+	return &apiv1.UpdateStrategyNotifyConfigReply{}, nil
+}
+
+func (s *StrategyService) UpdateStrategyDialTestConfig(ctx context.Context, req *apiv1.UpdateStrategyDialTestConfigRequest) (*apiv1.UpdateStrategyDialTestConfigReply, error) {
+	if err := s.strategyService.UpdateDialTestConfig(ctx, snowflake.ParseInt64(req.Uid), vobj.DialTestType(req.DialTestType), req.DialTestTargets); err != nil {
+		return nil, err
+	}
+	return &apiv1.UpdateStrategyDialTestConfigReply{}, nil
+}
+
+func (s *StrategyService) UpdateStrategySuppressConfig(ctx context.Context, req *apiv1.UpdateStrategySuppressConfigRequest) (*apiv1.UpdateStrategySuppressConfigReply, error) {
+	if err := s.strategyService.UpdateSuppressConfig(ctx, snowflake.ParseInt64(req.Uid), req.SuppressType, req.SuppressConfig); err != nil {
+		return nil, err
+	}
+	return &apiv1.UpdateStrategySuppressConfigReply{}, nil
+}
+
+// toAPIV1ReceiverItem converts receiver entity to API response
+func toAPIV1ReceiverItem(r *strategy.Receiver) *apiv1.ReceiverItem {
+	userIDs := make([]int64, 0, len(r.UserIDs()))
+	for uid := range r.UserIDs() {
+		userIDs = append(userIDs, uid.Int64())
+	}
+	notifyTypes := make([]string, 0, len(r.NotifyTypes()))
+	for _, t := range r.NotifyTypes() {
+		notifyTypes = append(notifyTypes, string(t))
+	}
+	return &apiv1.ReceiverItem{
+		Uid:         r.UID().Int64(),
+		NamespaceUid: r.NamespaceUID().Int64(),
+		Type:        string(r.Type()),
+		Name:        r.Name(),
+		Description: r.Description(),
+		UserIds:     userIDs,
+		LabelMatch:  r.LabelMatch(),
+		NotifyTypes: notifyTypes,
+		CreatedAt:  r.CreatedAt().Unix(),
+		UpdatedAt:   r.UpdatedAt().Unix(),
+	}
+}
+
+// toAPIV1ListReceiverReply converts receiver page to API response
+func toAPIV1ListReceiverReply(page *shared.Page[*strategy.Receiver]) *apiv1.ListReceiverReply {
+	items := make([]*apiv1.ReceiverItem, 0, len(page.Items))
+	for _, r := range page.Items {
+		items = append(items, toAPIV1ReceiverItem(r))
+	}
+	return &apiv1.ListReceiverReply{
+		Receivers: items,
+		Total:     page.Total,
+	}
+}
+

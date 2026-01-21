@@ -99,6 +99,116 @@ service Strategy {
 			delete: "/v1/strategy/group/{group_uid}/strategy/{strategy_uid}"
 		};
 	}
+
+	// 策略组升级模式更新接口
+	rpc UpdateStrategyGroupUpgradeMode (UpdateStrategyGroupUpgradeModeRequest) returns (UpdateStrategyGroupUpgradeModeReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/group/{uid}/upgrade-mode"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyGroupUpgradeConfig (UpdateStrategyGroupUpgradeConfigRequest) returns (UpdateStrategyGroupUpgradeConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/group/{uid}/upgrade-config"
+			body: "*"
+		};
+	}
+
+	// 接收对象相关接口
+	rpc CreateReceiver (CreateReceiverRequest) returns (CreateReceiverReply) {
+		option (google.api.http) = {
+			post: "/v1/receiver"
+			body: "*"
+		};
+	}
+	rpc UpdateReceiver (UpdateReceiverRequest) returns (UpdateReceiverReply) {
+		option (google.api.http) = {
+			put: "/v1/receiver/{uid}"
+			body: "*"
+		};
+	}
+	rpc DeleteReceiver (DeleteReceiverRequest) returns (DeleteReceiverReply) {
+		option (google.api.http) = {
+			delete: "/v1/receiver/{uid}"
+		};
+	}
+	rpc GetReceiver (GetReceiverRequest) returns (ReceiverItem) {
+		option (google.api.http) = {
+			get: "/v1/receiver/{uid}"
+		};
+	}
+	rpc ListReceiver (ListReceiverRequest) returns (ListReceiverReply) {
+		option (google.api.http) = {
+			get: "/v1/receivers"
+		};
+	}
+
+	// 策略规则相关接口
+	rpc CreateStrategyRule (CreateStrategyRuleRequest) returns (CreateStrategyRuleReply) {
+		option (google.api.http) = {
+			post: "/v1/strategy/{strategy_uid}/rule"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyRule (UpdateStrategyRuleRequest) returns (UpdateStrategyRuleReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/rule/{uid}"
+			body: "*"
+		};
+	}
+	rpc DeleteStrategyRule (DeleteStrategyRuleRequest) returns (DeleteStrategyRuleReply) {
+		option (google.api.http) = {
+			delete: "/v1/strategy/rule/{uid}"
+		};
+	}
+	rpc GetStrategyRule (GetStrategyRuleRequest) returns (StrategyRuleItem) {
+		option (google.api.http) = {
+			get: "/v1/strategy/rule/{uid}"
+		};
+	}
+	rpc ListStrategyRule (ListStrategyRuleRequest) returns (ListStrategyRuleReply) {
+		option (google.api.http) = {
+			get: "/v1/strategy/{strategy_uid}/rules"
+		};
+	}
+	rpc UpdateStrategyRuleStatus (UpdateStrategyRuleStatusRequest) returns (UpdateStrategyRuleStatusReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/rule/{uid}/status"
+			body: "*"
+		};
+	}
+
+	// 策略详细配置更新接口
+	rpc UpdateStrategyDataSourceConfig (UpdateStrategyDataSourceConfigRequest) returns (UpdateStrategyDataSourceConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/datasource-config"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyAlertConfig (UpdateStrategyAlertConfigRequest) returns (UpdateStrategyAlertConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/alert-config"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyNotifyConfig (UpdateStrategyNotifyConfigRequest) returns (UpdateStrategyNotifyConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/notify-config"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyDialTestConfig (UpdateStrategyDialTestConfigRequest) returns (UpdateStrategyDialTestConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/dial-test-config"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategySuppressConfig (UpdateStrategySuppressConfigRequest) returns (UpdateStrategySuppressConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/suppress-config"
+			body: "*"
+		};
+	}
 }
 
 message CreateStrategyRequest {
@@ -264,4 +374,181 @@ message RemoveStrategyFromGroupRequest {
 }
 
 message RemoveStrategyFromGroupReply {}
+
+// 策略组升级模式更新消息
+message UpdateStrategyGroupUpgradeModeRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	int32 upgrade_mode = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateStrategyGroupUpgradeModeReply {}
+
+message UpdateStrategyGroupUpgradeConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string upgrade_config = 2;
+}
+
+message UpdateStrategyGroupUpgradeConfigReply {}
+
+// 接收对象相关消息
+message CreateReceiverRequest {
+	int64 namespace_uid = 1 [(buf.validate.field).required = true];
+	string type = 2 [(buf.validate.field).required = true];
+	string name = 3 [(buf.validate.field).required = true];
+	string description = 4;
+	repeated int64 user_ids = 5;
+	map<string, string> label_match = 6;
+	repeated string notify_types = 7;
+}
+
+message CreateReceiverReply {}
+
+message UpdateReceiverRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string name = 2;
+	string description = 3;
+	repeated int64 user_ids = 4;
+	map<string, string> label_match = 5;
+	repeated string notify_types = 6;
+}
+
+message UpdateReceiverReply {}
+
+message DeleteReceiverRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteReceiverReply {}
+
+message GetReceiverRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message ReceiverItem {
+	int64 uid = 1;
+	int64 namespace_uid = 2;
+	string type = 3;
+	string name = 4;
+	string description = 5;
+	repeated int64 user_ids = 6;
+	map<string, string> label_match = 7;
+	repeated string notify_types = 8;
+	int64 created_at = 9;
+	int64 updated_at = 10;
+}
+
+message ListReceiverRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	int64 namespace_uid = 3;
+	string type = 4;
+	string keyword = 5;
+}
+
+message ListReceiverReply {
+	repeated ReceiverItem receivers = 1;
+	int64 total = 2;
+}
+
+// 策略规则相关消息
+message CreateStrategyRuleRequest {
+	int64 strategy_uid = 1 [(buf.validate.field).required = true];
+	string rule_detail = 2 [(buf.validate.field).required = true];
+	int32 alert_level = 3;
+	repeated string alert_pages = 4;
+	int32 order = 5;
+}
+
+message CreateStrategyRuleReply {}
+
+message UpdateStrategyRuleRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string rule_detail = 2;
+	int32 alert_level = 3;
+	repeated string alert_pages = 4;
+	int32 order = 5;
+}
+
+message UpdateStrategyRuleReply {}
+
+message DeleteStrategyRuleRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteStrategyRuleReply {}
+
+message GetStrategyRuleRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message StrategyRuleItem {
+	int64 uid = 1;
+	int64 strategy_uid = 2;
+	string rule_detail = 3;
+	enum.GlobalStatus status = 4;
+	int32 alert_level = 5;
+	repeated string alert_pages = 6;
+	int32 order = 7;
+	int64 created_at = 8;
+	int64 updated_at = 9;
+}
+
+message ListStrategyRuleRequest {
+	int64 strategy_uid = 1 [(buf.validate.field).required = true];
+	enum.GlobalStatus status = 2;
+}
+
+message ListStrategyRuleReply {
+	repeated StrategyRuleItem rules = 1;
+}
+
+message UpdateStrategyRuleStatusRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	enum.GlobalStatus status = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateStrategyRuleStatusReply {}
+
+// 策略详细配置更新消息
+message UpdateStrategyDataSourceConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	repeated int64 datasource_uids = 2;
+	string query = 3;
+	string datasource_type = 4;
+}
+
+message UpdateStrategyDataSourceConfigReply {}
+
+message UpdateStrategyAlertConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string alert_title = 2;
+	string alert_content = 3;
+	int32 alert_level = 4;
+	repeated string alert_pages = 5;
+}
+
+message UpdateStrategyAlertConfigReply {}
+
+message UpdateStrategyNotifyConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	repeated int64 receiver_uids = 2;
+}
+
+message UpdateStrategyNotifyConfigReply {}
+
+message UpdateStrategyDialTestConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string dial_test_type = 2;
+	map<string, string> dial_test_targets = 3;
+}
+
+message UpdateStrategyDialTestConfigReply {}
+
+message UpdateStrategySuppressConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string suppress_type = 2;
+	string suppress_config = 3;
+}
+
+message UpdateStrategySuppressConfigReply {}
 

@@ -307,8 +307,20 @@ func (s *Service) RemoveStrategyFromGroup(ctx context.Context, strategyUID snowf
 }
 
 // Receiver methods
-func (s *Service) CreateReceiver(ctx context.Context, namespaceUID snowflake.ID, typ vobj.ReceiverType, name string) error {
+func (s *Service) CreateReceiver(ctx context.Context, namespaceUID snowflake.ID, typ vobj.ReceiverType, name string, description string, userIDs map[snowflake.ID]bool, labelMatch map[string]string, notifyTypes []vobj.NotifyType) error {
 	receiver := NewReceiver(namespaceUID, typ, name)
+	if description != "" {
+		receiver.UpdateDescription(description)
+	}
+	if userIDs != nil {
+		receiver.UpdateUserIDs(userIDs)
+	}
+	if labelMatch != nil {
+		receiver.UpdateLabelMatch(labelMatch)
+	}
+	if notifyTypes != nil {
+		receiver.UpdateNotifyTypes(notifyTypes)
+	}
 	if err := s.receiverRepo.Save(ctx, receiver); err != nil {
 		s.helper.Errorw("msg", "create receiver failed", "error", err, "name", name)
 		return merr.ErrorInternal("create receiver %s failed", name).WithCause(err)
@@ -335,4 +347,187 @@ func (s *Service) ListReceivers(ctx context.Context, query *ReceiverListQuery) (
 		return nil, merr.ErrorInternal("list receiver failed").WithCause(err)
 	}
 	return page, nil
+}
+
+func (s *Service) UpdateReceiver(ctx context.Context, uid snowflake.ID, name string, description string, userIDs map[snowflake.ID]bool, labelMatch map[string]string, notifyTypes []vobj.NotifyType) error {
+	receiver, err := s.receiverRepo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("receiver %s not found", uid)
+		}
+		return merr.ErrorInternal("get receiver failed").WithCause(err)
+	}
+
+	if name != "" {
+		if err := receiver.UpdateName(name); err != nil {
+			return err
+		}
+	}
+	if description != "" {
+		receiver.UpdateDescription(description)
+	}
+	if userIDs != nil {
+		receiver.UpdateUserIDs(userIDs)
+	}
+	if labelMatch != nil {
+		receiver.UpdateLabelMatch(labelMatch)
+	}
+	if notifyTypes != nil {
+		receiver.UpdateNotifyTypes(notifyTypes)
+	}
+
+	if err := s.receiverRepo.Save(ctx, receiver); err != nil {
+		s.helper.Errorw("msg", "update receiver failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update receiver %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) DeleteReceiver(ctx context.Context, uid snowflake.ID) error {
+	if err := s.receiverRepo.Delete(ctx, uid); err != nil {
+		s.helper.Errorw("msg", "delete receiver failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("delete receiver %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) UpdateGroupUpgradeMode(ctx context.Context, uid snowflake.ID, mode vobj.UpgradeMode) error {
+	group, err := s.groupRepo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("strategy group %s not found", uid)
+		}
+		return merr.ErrorInternal("get strategy group failed").WithCause(err)
+	}
+
+	group.UpdateUpgradeMode(mode)
+	if err := s.groupRepo.Save(ctx, group); err != nil {
+		s.helper.Errorw("msg", "update strategy group upgrade mode failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update strategy group upgrade mode %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) UpdateGroupUpgradeConfig(ctx context.Context, uid snowflake.ID, config string) error {
+	group, err := s.groupRepo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("strategy group %s not found", uid)
+		}
+		return merr.ErrorInternal("get strategy group failed").WithCause(err)
+	}
+
+	group.UpdateUpgradeConfig(config)
+	if err := s.groupRepo.Save(ctx, group); err != nil {
+		s.helper.Errorw("msg", "update strategy group upgrade config failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update strategy group upgrade config %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) UpdateDataSourceConfig(ctx context.Context, uid snowflake.ID, dataSourceUIDs map[snowflake.ID]bool, query string, dataSourceType string) error {
+	strategy, err := s.repo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("strategy %s not found", uid)
+		}
+		return merr.ErrorInternal("get strategy failed").WithCause(err)
+	}
+
+	if dataSourceUIDs != nil {
+		strategy.UpdateDataSourceUIDs(dataSourceUIDs)
+	}
+	if query != "" {
+		strategy.UpdateQuery(query)
+	}
+	if dataSourceType != "" {
+		strategy.UpdateDataSourceType(dataSourceType)
+	}
+
+	if err := s.repo.Save(ctx, strategy); err != nil {
+		s.helper.Errorw("msg", "update strategy datasource config failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update strategy datasource config %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) UpdateAlertConfig(ctx context.Context, uid snowflake.ID, alertTitle string, alertContent string, alertLevel vobj.AlertLevel, alertPages []string) error {
+	strategy, err := s.repo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("strategy %s not found", uid)
+		}
+		return merr.ErrorInternal("get strategy failed").WithCause(err)
+	}
+
+	if alertTitle != "" {
+		strategy.UpdateAlertTitle(alertTitle)
+	}
+	if alertContent != "" {
+		strategy.UpdateAlertContent(alertContent)
+	}
+	if alertLevel != 0 {
+		strategy.UpdateAlertLevel(alertLevel)
+	}
+	if alertPages != nil {
+		strategy.UpdateAlertPages(alertPages)
+	}
+
+	if err := s.repo.Save(ctx, strategy); err != nil {
+		s.helper.Errorw("msg", "update strategy alert config failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update strategy alert config %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) UpdateNotifyConfig(ctx context.Context, uid snowflake.ID, receiverUIDs map[snowflake.ID]bool) error {
+	// TODO: 需要实现策略与接收对象的关联管理（通过 strategy_receiver 表）
+	// 暂时先返回未实现错误
+	return merr.ErrorInternal("update notify config not implemented yet")
+}
+
+func (s *Service) UpdateDialTestConfig(ctx context.Context, uid snowflake.ID, dialTestType vobj.DialTestType, dialTestTargets map[string]string) error {
+	strategy, err := s.repo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("strategy %s not found", uid)
+		}
+		return merr.ErrorInternal("get strategy failed").WithCause(err)
+	}
+
+	if dialTestType != "" {
+		strategy.UpdateDialTestType(dialTestType)
+	}
+	if dialTestTargets != nil {
+		strategy.UpdateDialTestTargets(dialTestTargets)
+	}
+
+	if err := s.repo.Save(ctx, strategy); err != nil {
+		s.helper.Errorw("msg", "update strategy dial test config failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update strategy dial test config %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) UpdateSuppressConfig(ctx context.Context, uid snowflake.ID, suppressType string, suppressConfig string) error {
+	strategy, err := s.repo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("strategy %s not found", uid)
+		}
+		return merr.ErrorInternal("get strategy failed").WithCause(err)
+	}
+
+	if suppressType != "" {
+		strategy.UpdateSuppressType(suppressType)
+	}
+	if suppressConfig != "" {
+		strategy.UpdateSuppressConfig(suppressConfig)
+	}
+
+	if err := s.repo.Save(ctx, strategy); err != nil {
+		s.helper.Errorw("msg", "update strategy suppress config failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update strategy suppress config %s failed", uid).WithCause(err)
+	}
+	return nil
 }

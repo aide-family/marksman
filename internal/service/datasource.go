@@ -149,18 +149,140 @@ func toAPIV1SelectDataSourceReply(result *datasource.SelectResult) *apiv1.Select
 	}
 }
 
-// TestConnection tests datasource connection
-// Note: After running `make api` to regenerate proto files, uncomment this method
-// func (s *DataSourceService) TestConnection(ctx context.Context, req *apiv1.TestConnectionRequest) (*apiv1.TestConnectionReply, error) {
-// 	err := s.dataSourceService.TestConnection(ctx, snowflake.ParseInt64(req.Uid))
-// 	if err != nil {
-// 		return &apiv1.TestConnectionReply{
-// 			Success: false,
-// 			Message: err.Error(),
-// 		}, nil
-// 	}
-// 	return &apiv1.TestConnectionReply{
-// 		Success: true,
-// 		Message: "connection test successful",
-// 	}, nil
-// }
+func (s *DataSourceService) TestConnection(ctx context.Context, req *apiv1.TestConnectionRequest) (*apiv1.TestConnectionReply, error) {
+	err := s.dataSourceService.TestConnection(ctx, snowflake.ParseInt64(req.Uid))
+	if err != nil {
+		return &apiv1.TestConnectionReply{
+			Success: false,
+			Message: err.Error(),
+		}, nil
+	}
+	return &apiv1.TestConnectionReply{
+		Success: true,
+		Message: "connection test successful",
+	}, nil
+}
+
+// 及时查询相关接口实现（占位实现，需要后续完善 biz 层）
+func (s *DataSourceService) QueryDataSource(ctx context.Context, req *apiv1.QueryDataSourceRequest) (*apiv1.QueryDataSourceReply, error) {
+	// TODO: 实现数据源查询逻辑
+	return &apiv1.QueryDataSourceReply{
+		Result: "{}",
+	}, nil
+}
+
+func (s *DataSourceService) ListQueryHistory(ctx context.Context, req *apiv1.ListQueryHistoryRequest) (*apiv1.ListQueryHistoryReply, error) {
+	// TODO: 实现查询历史记录逻辑
+	return &apiv1.ListQueryHistoryReply{
+		Items: []*apiv1.QueryHistoryItem{},
+		Total:  0,
+	}, nil
+}
+
+func (s *DataSourceService) SaveQueryFavorite(ctx context.Context, req *apiv1.SaveQueryFavoriteRequest) (*apiv1.SaveQueryFavoriteReply, error) {
+	// TODO: 实现保存查询收藏逻辑
+	return &apiv1.SaveQueryFavoriteReply{
+		FavoriteId: 0,
+	}, nil
+}
+
+func (s *DataSourceService) ListQueryFavorites(ctx context.Context, req *apiv1.ListQueryFavoritesRequest) (*apiv1.ListQueryFavoritesReply, error) {
+	// TODO: 实现查询收藏列表逻辑
+	return &apiv1.ListQueryFavoritesReply{
+		Items: []*apiv1.QueryFavoriteItem{},
+	}, nil
+}
+
+func (s *DataSourceService) DeleteQueryFavorite(ctx context.Context, req *apiv1.DeleteQueryFavoriteRequest) (*apiv1.DeleteQueryFavoriteReply, error) {
+	// TODO: 实现删除查询收藏逻辑
+	return &apiv1.DeleteQueryFavoriteReply{}, nil
+}
+
+// 告警模板相关接口实现（占位实现，需要后续完善 biz 层）
+func (s *DataSourceService) CreateAlertTemplate(ctx context.Context, req *apiv1.CreateAlertTemplateRequest) (*apiv1.CreateAlertTemplateReply, error) {
+	// TODO: 实现创建告警模板逻辑
+	return &apiv1.CreateAlertTemplateReply{}, nil
+}
+
+func (s *DataSourceService) UpdateAlertTemplate(ctx context.Context, req *apiv1.UpdateAlertTemplateRequest) (*apiv1.UpdateAlertTemplateReply, error) {
+	// TODO: 实现更新告警模板逻辑
+	return &apiv1.UpdateAlertTemplateReply{}, nil
+}
+
+func (s *DataSourceService) DeleteAlertTemplate(ctx context.Context, req *apiv1.DeleteAlertTemplateRequest) (*apiv1.DeleteAlertTemplateReply, error) {
+	// TODO: 实现删除告警模板逻辑
+	return &apiv1.DeleteAlertTemplateReply{}, nil
+}
+
+func (s *DataSourceService) GetAlertTemplate(ctx context.Context, req *apiv1.GetAlertTemplateRequest) (*apiv1.AlertTemplateItem, error) {
+	// TODO: 实现获取告警模板逻辑
+	return &apiv1.AlertTemplateItem{}, nil
+}
+
+func (s *DataSourceService) ListAlertTemplate(ctx context.Context, req *apiv1.ListAlertTemplateRequest) (*apiv1.ListAlertTemplateReply, error) {
+	// TODO: 实现列表查询告警模板逻辑
+	return &apiv1.ListAlertTemplateReply{
+		Templates: []*apiv1.AlertTemplateItem{},
+		Total:     0,
+	}, nil
+}
+
+func (s *DataSourceService) UpdateAlertTemplateStatus(ctx context.Context, req *apiv1.UpdateAlertTemplateStatusRequest) (*apiv1.UpdateAlertTemplateStatusReply, error) {
+	// TODO: 实现更新告警模板状态逻辑
+	return &apiv1.UpdateAlertTemplateStatusReply{}, nil
+}
+
+func (s *DataSourceService) ApplyAlertTemplate(ctx context.Context, req *apiv1.ApplyAlertTemplateRequest) (*apiv1.ApplyAlertTemplateReply, error) {
+	// TODO: 实现应用告警模板逻辑
+	return &apiv1.ApplyAlertTemplateReply{}, nil
+}
+
+// 数据源代理相关接口实现（占位实现，需要后续完善 biz 层）
+func (s *DataSourceService) CreateDataSourceProxy(ctx context.Context, req *apiv1.CreateDataSourceProxyRequest) (*apiv1.CreateDataSourceProxyReply, error) {
+	// TODO: 实现创建数据源代理逻辑
+	return &apiv1.CreateDataSourceProxyReply{}, nil
+}
+
+func (s *DataSourceService) UpdateDataSourceProxy(ctx context.Context, req *apiv1.UpdateDataSourceProxyRequest) (*apiv1.UpdateDataSourceProxyReply, error) {
+	// TODO: 实现更新数据源代理逻辑
+	return &apiv1.UpdateDataSourceProxyReply{}, nil
+}
+
+func (s *DataSourceService) DeleteDataSourceProxy(ctx context.Context, req *apiv1.DeleteDataSourceProxyRequest) (*apiv1.DeleteDataSourceProxyReply, error) {
+	// TODO: 实现删除数据源代理逻辑
+	return &apiv1.DeleteDataSourceProxyReply{}, nil
+}
+
+func (s *DataSourceService) GetDataSourceProxy(ctx context.Context, req *apiv1.GetDataSourceProxyRequest) (*apiv1.DataSourceProxyItem, error) {
+	// TODO: 实现获取数据源代理逻辑
+	return &apiv1.DataSourceProxyItem{}, nil
+}
+
+func (s *DataSourceService) ListDataSourceProxy(ctx context.Context, req *apiv1.ListDataSourceProxyRequest) (*apiv1.ListDataSourceProxyReply, error) {
+	// TODO: 实现列表查询数据源代理逻辑
+	return &apiv1.ListDataSourceProxyReply{
+		Proxies: []*apiv1.DataSourceProxyItem{},
+		Total:   0,
+	}, nil
+}
+
+// 元数据管理相关接口实现（占位实现，需要后续完善 biz 层）
+func (s *DataSourceService) ListDataSourceMetadata(ctx context.Context, req *apiv1.ListDataSourceMetadataRequest) (*apiv1.ListDataSourceMetadataReply, error) {
+	// TODO: 实现列表查询元数据逻辑
+	return &apiv1.ListDataSourceMetadataReply{
+		Items: []*apiv1.DataSourceMetadataItem{},
+		Total: 0,
+	}, nil
+}
+
+func (s *DataSourceService) GetDataSourceMetadata(ctx context.Context, req *apiv1.GetDataSourceMetadataRequest) (*apiv1.DataSourceMetadataItem, error) {
+	// TODO: 实现获取元数据详情逻辑
+	return &apiv1.DataSourceMetadataItem{}, nil
+}
+
+func (s *DataSourceService) RefreshDataSourceMetadata(ctx context.Context, req *apiv1.RefreshDataSourceMetadataRequest) (*apiv1.RefreshDataSourceMetadataReply, error) {
+	// TODO: 实现刷新元数据逻辑
+	return &apiv1.RefreshDataSourceMetadataReply{
+		MetricCount: 0,
+	}, nil
+}

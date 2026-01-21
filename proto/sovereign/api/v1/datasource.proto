@@ -54,6 +54,122 @@ service DataSource {
 			post: "/v1/datasource/{uid}/test"
 		};
 	}
+
+	// 及时查询相关接口
+	rpc QueryDataSource (QueryDataSourceRequest) returns (QueryDataSourceReply) {
+		option (google.api.http) = {
+			post: "/v1/datasource/{uid}/query"
+			body: "*"
+		};
+	}
+	rpc ListQueryHistory (ListQueryHistoryRequest) returns (ListQueryHistoryReply) {
+		option (google.api.http) = {
+			get: "/v1/datasource/{uid}/query/history"
+		};
+	}
+	rpc SaveQueryFavorite (SaveQueryFavoriteRequest) returns (SaveQueryFavoriteReply) {
+		option (google.api.http) = {
+			post: "/v1/datasource/{uid}/query/favorite"
+			body: "*"
+		};
+	}
+	rpc ListQueryFavorites (ListQueryFavoritesRequest) returns (ListQueryFavoritesReply) {
+		option (google.api.http) = {
+			get: "/v1/datasource/{uid}/query/favorites"
+		};
+	}
+	rpc DeleteQueryFavorite (DeleteQueryFavoriteRequest) returns (DeleteQueryFavoriteReply) {
+		option (google.api.http) = {
+			delete: "/v1/datasource/{uid}/query/favorite/{favorite_id}"
+		};
+	}
+
+	// 告警模板相关接口
+	rpc CreateAlertTemplate (CreateAlertTemplateRequest) returns (CreateAlertTemplateReply) {
+		option (google.api.http) = {
+			post: "/v1/datasource/{datasource_uid}/alert-template"
+			body: "*"
+		};
+	}
+	rpc UpdateAlertTemplate (UpdateAlertTemplateRequest) returns (UpdateAlertTemplateReply) {
+		option (google.api.http) = {
+			put: "/v1/datasource/alert-template/{uid}"
+			body: "*"
+		};
+	}
+	rpc DeleteAlertTemplate (DeleteAlertTemplateRequest) returns (DeleteAlertTemplateReply) {
+		option (google.api.http) = {
+			delete: "/v1/datasource/alert-template/{uid}"
+		};
+	}
+	rpc GetAlertTemplate (GetAlertTemplateRequest) returns (AlertTemplateItem) {
+		option (google.api.http) = {
+			get: "/v1/datasource/alert-template/{uid}"
+		};
+	}
+	rpc ListAlertTemplate (ListAlertTemplateRequest) returns (ListAlertTemplateReply) {
+		option (google.api.http) = {
+			get: "/v1/datasource/{datasource_uid}/alert-templates"
+		};
+	}
+	rpc UpdateAlertTemplateStatus (UpdateAlertTemplateStatusRequest) returns (UpdateAlertTemplateStatusReply) {
+		option (google.api.http) = {
+			put: "/v1/datasource/alert-template/{uid}/status"
+			body: "*"
+		};
+	}
+	rpc ApplyAlertTemplate (ApplyAlertTemplateRequest) returns (ApplyAlertTemplateReply) {
+		option (google.api.http) = {
+			post: "/v1/datasource/alert-template/{uid}/apply"
+			body: "*"
+		};
+	}
+
+	// 数据源代理相关接口
+	rpc CreateDataSourceProxy (CreateDataSourceProxyRequest) returns (CreateDataSourceProxyReply) {
+		option (google.api.http) = {
+			post: "/v1/datasource/proxy"
+			body: "*"
+		};
+	}
+	rpc UpdateDataSourceProxy (UpdateDataSourceProxyRequest) returns (UpdateDataSourceProxyReply) {
+		option (google.api.http) = {
+			put: "/v1/datasource/proxy/{uid}"
+			body: "*"
+		};
+	}
+	rpc DeleteDataSourceProxy (DeleteDataSourceProxyRequest) returns (DeleteDataSourceProxyReply) {
+		option (google.api.http) = {
+			delete: "/v1/datasource/proxy/{uid}"
+		};
+	}
+	rpc GetDataSourceProxy (GetDataSourceProxyRequest) returns (DataSourceProxyItem) {
+		option (google.api.http) = {
+			get: "/v1/datasource/proxy/{uid}"
+		};
+	}
+	rpc ListDataSourceProxy (ListDataSourceProxyRequest) returns (ListDataSourceProxyReply) {
+		option (google.api.http) = {
+			get: "/v1/datasource/proxies"
+		};
+	}
+
+	// 元数据管理相关接口
+	rpc ListDataSourceMetadata (ListDataSourceMetadataRequest) returns (ListDataSourceMetadataReply) {
+		option (google.api.http) = {
+			get: "/v1/datasource/{uid}/metadata"
+		};
+	}
+	rpc GetDataSourceMetadata (GetDataSourceMetadataRequest) returns (DataSourceMetadataItem) {
+		option (google.api.http) = {
+			get: "/v1/datasource/{uid}/metadata/{metric_name}"
+		};
+	}
+	rpc RefreshDataSourceMetadata (RefreshDataSourceMetadataRequest) returns (RefreshDataSourceMetadataReply) {
+		option (google.api.http) = {
+			post: "/v1/datasource/{uid}/metadata/refresh"
+		};
+	}
 }
 
 message CreateDataSourceRequest {
@@ -173,4 +289,223 @@ message TestConnectionRequest {
 message TestConnectionReply {
 	bool success = 1;
 	string message = 2;
+}
+
+// 及时查询相关消息
+message QueryDataSourceRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string query = 2 [(buf.validate.field).required = true];
+	string format = 3; // table/graph/json
+}
+
+message QueryDataSourceReply {
+	string result = 1; // JSON 格式的查询结果
+}
+
+message ListQueryHistoryRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	int32 page = 2;
+	int32 page_size = 3;
+}
+
+message ListQueryHistoryReply {
+	repeated QueryHistoryItem items = 1;
+	int64 total = 2;
+}
+
+message QueryHistoryItem {
+	int64 id = 1;
+	string query = 2;
+	int64 created_at = 3;
+}
+
+message SaveQueryFavoriteRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string query = 2 [(buf.validate.field).required = true];
+	string name = 3 [(buf.validate.field).required = true];
+}
+
+message SaveQueryFavoriteReply {
+	int64 favorite_id = 1;
+}
+
+message ListQueryFavoritesRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message ListQueryFavoritesReply {
+	repeated QueryFavoriteItem items = 1;
+}
+
+message QueryFavoriteItem {
+	int64 id = 1;
+	string name = 2;
+	string query = 3;
+	int64 created_at = 4;
+}
+
+message DeleteQueryFavoriteRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	int64 favorite_id = 2 [(buf.validate.field).required = true];
+}
+
+message DeleteQueryFavoriteReply {}
+
+// 告警模板相关消息
+message CreateAlertTemplateRequest {
+	int64 datasource_uid = 1 [(buf.validate.field).required = true];
+	string name = 2 [(buf.validate.field).required = true];
+	string title_template = 3;
+	string content_template = 4;
+}
+
+message CreateAlertTemplateReply {}
+
+message UpdateAlertTemplateRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string name = 2;
+	string title_template = 3;
+	string content_template = 4;
+}
+
+message UpdateAlertTemplateReply {}
+
+message DeleteAlertTemplateRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteAlertTemplateReply {}
+
+message GetAlertTemplateRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message AlertTemplateItem {
+	int64 uid = 1;
+	int64 datasource_uid = 2;
+	string name = 3;
+	string title_template = 4;
+	string content_template = 5;
+	enum.GlobalStatus status = 6;
+	int64 created_at = 7;
+	int64 updated_at = 8;
+}
+
+message ListAlertTemplateRequest {
+	int64 datasource_uid = 1 [(buf.validate.field).required = true];
+	int32 page = 2;
+	int32 page_size = 3;
+	string keyword = 4;
+	enum.GlobalStatus status = 5;
+}
+
+message ListAlertTemplateReply {
+	repeated AlertTemplateItem templates = 1;
+	int64 total = 2;
+}
+
+message UpdateAlertTemplateStatusRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	enum.GlobalStatus status = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateAlertTemplateStatusReply {}
+
+message ApplyAlertTemplateRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	int64 strategy_uid = 2 [(buf.validate.field).required = true];
+}
+
+message ApplyAlertTemplateReply {}
+
+// 数据源代理相关消息
+message CreateDataSourceProxyRequest {
+	int64 namespace_uid = 1 [(buf.validate.field).required = true];
+	string type = 2 [(buf.validate.field).required = true];
+	string name = 3 [(buf.validate.field).required = true];
+	int64 datasource_uid = 4 [(buf.validate.field).required = true];
+	map<string, string> config = 5;
+}
+
+message CreateDataSourceProxyReply {}
+
+message UpdateDataSourceProxyRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string name = 2;
+	map<string, string> config = 3;
+}
+
+message UpdateDataSourceProxyReply {}
+
+message DeleteDataSourceProxyRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteDataSourceProxyReply {}
+
+message GetDataSourceProxyRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DataSourceProxyItem {
+	int64 uid = 1;
+	int64 namespace_uid = 2;
+	int64 datasource_uid = 3;
+	string type = 4;
+	string name = 5;
+	map<string, string> config = 6;
+	int64 created_at = 7;
+	int64 updated_at = 8;
+}
+
+message ListDataSourceProxyRequest {
+	int64 namespace_uid = 1;
+	string type = 2;
+	int32 page = 3;
+	int32 page_size = 4;
+	string keyword = 5;
+}
+
+message ListDataSourceProxyReply {
+	repeated DataSourceProxyItem proxies = 1;
+	int64 total = 2;
+}
+
+// 元数据管理相关消息
+message ListDataSourceMetadataRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	int32 page = 2;
+	int32 page_size = 3;
+	string metric_type = 4; // counter/gauge/histogram/summary
+	string keyword = 5;
+}
+
+message ListDataSourceMetadataReply {
+	repeated DataSourceMetadataItem items = 1;
+	int64 total = 2;
+}
+
+message DataSourceMetadataItem {
+	string metric_name = 1;
+	string metric_type = 2;
+	string description = 3;
+	int32 label_count = 4;
+	map<string, MetadataLabelValues> labels = 5; // 标签名称 -> 标签值列表
+}
+
+message MetadataLabelValues {
+	repeated string values = 1;
+}
+
+message GetDataSourceMetadataRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string metric_name = 2 [(buf.validate.field).required = true];
+}
+
+message RefreshDataSourceMetadataRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message RefreshDataSourceMetadataReply {
+	int32 metric_count = 1;
 }
