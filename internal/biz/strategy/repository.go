@@ -28,3 +28,16 @@ type ReceiverRepository interface {
 	List(ctx context.Context, query *ReceiverListQuery) (*shared.Page[*Receiver], error)
 }
 
+type StrategyRuleRepository interface {
+	Save(ctx context.Context, rule *StrategyRule) error
+	FindByID(ctx context.Context, uid snowflake.ID) (*StrategyRule, error)
+	Delete(ctx context.Context, uid snowflake.ID) error
+	List(ctx context.Context, strategyUID snowflake.ID, status vobj.GlobalStatus) ([]*StrategyRule, error)
+}
+
+// StrategyReceiverRepository 管理策略与接收对象的关联
+type StrategyReceiverRepository interface {
+	SaveStrategyReceivers(ctx context.Context, strategyUID snowflake.ID, receiverUIDs map[snowflake.ID]bool) error
+	GetStrategyReceivers(ctx context.Context, strategyUID snowflake.ID) (map[snowflake.ID]bool, error)
+}
+

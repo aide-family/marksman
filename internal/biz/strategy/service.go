@@ -11,20 +11,24 @@ import (
 )
 
 type Service struct {
-	repo         Repository
-	groupRepo    GroupRepository
-	receiverRepo ReceiverRepository
-	validator    *Validator
-	helper       *klog.Helper
+	repo              Repository
+	groupRepo         GroupRepository
+	receiverRepo      ReceiverRepository
+	ruleRepo          StrategyRuleRepository
+	strategyReceiverRepo StrategyReceiverRepository
+	validator         *Validator
+	helper            *klog.Helper
 }
 
-func NewService(repo Repository, groupRepo GroupRepository, receiverRepo ReceiverRepository, validator *Validator, helper *klog.Helper) *Service {
+func NewService(repo Repository, groupRepo GroupRepository, receiverRepo ReceiverRepository, ruleRepo StrategyRuleRepository, strategyReceiverRepo StrategyReceiverRepository, validator *Validator, helper *klog.Helper) *Service {
 	return &Service{
-		repo:         repo,
-		groupRepo:    groupRepo,
-		receiverRepo: receiverRepo,
-		validator:    validator,
-		helper:       klog.NewHelper(klog.With(helper.Logger(), "biz", "strategy")),
+		repo:              repo,
+		groupRepo:         groupRepo,
+		receiverRepo:      receiverRepo,
+		ruleRepo:          ruleRepo,
+		strategyReceiverRepo: strategyReceiverRepo,
+		validator:         validator,
+		helper:            klog.NewHelper(klog.With(helper.Logger(), "biz", "strategy")),
 	}
 }
 
@@ -481,9 +485,32 @@ func (s *Service) UpdateAlertConfig(ctx context.Context, uid snowflake.ID, alert
 }
 
 func (s *Service) UpdateNotifyConfig(ctx context.Context, uid snowflake.ID, receiverUIDs map[snowflake.ID]bool) error {
-	// TODO: 需要实现策略与接收对象的关联管理（通过 strategy_receiver 表）
-	// 暂时先返回未实现错误
-	return merr.ErrorInternal("update notify config not implemented yet")
+	// 验证策略存在
+	_, err := s.repo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("strategy %s not found", uid)
+		}
+		return merr.ErrorInternal("get strategy failed").WithCause(err)
+	}
+
+	// 验证接收对象存在
+	for receiverUID := range receiverUIDs {
+		_, err := s.receiverRepo.FindByID(ctx, receiverUID)
+		if err != nil {
+			if merr.IsNotFound(err) {
+				return merr.ErrorNotFound("receiver %s not found", receiverUID)
+			}
+			return merr.ErrorInternal("get receiver failed").WithCause(err)
+		}
+	}
+
+	// 更新策略与接收对象的关联
+	if err := s.strategyReceiverRepo.SaveStrategyReceivers(ctx, uid, receiverUIDs); err != nil {
+		s.helper.Errorw("msg", "update strategy notify config failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update strategy notify config %s failed", uid).WithCause(err)
+	}
+	return nil
 }
 
 func (s *Service) UpdateDialTestConfig(ctx context.Context, uid snowflake.ID, dialTestType vobj.DialTestType, dialTestTargets map[string]string) error {
@@ -528,6 +555,110 @@ func (s *Service) UpdateSuppressConfig(ctx context.Context, uid snowflake.ID, su
 	if err := s.repo.Save(ctx, strategy); err != nil {
 		s.helper.Errorw("msg", "update strategy suppress config failed", "error", err, "uid", uid)
 		return merr.ErrorInternal("update strategy suppress config %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+// StrategyRule methods
+func (s *Service) CreateStrategyRule(ctx context.Context, strategyUID snowflake.ID, ruleDetail string, alertLevel vobj.AlertLevel, alertPages []string, order int32) error {
+	rule := NewStrategyRule(strategyUID, ruleDetail)
+	if alertLevel != 0 {
+		rule.UpdateAlertLevel(alertLevel)
+	}
+	if alertPages != nil {
+		rule.UpdateAlertPages(alertPages)
+	}
+	if order > 0 {
+		rule.UpdateOrder(order)
+	}
+
+	if err := s.ruleRepo.Save(ctx, rule); err != nil {
+		s.helper.Errorw("msg", "create strategy rule failed", "error", err, "strategyUID", strategyUID)
+		return merr.ErrorInternal("create strategy rule failed").WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) UpdateStrategyRule(ctx context.Context, uid snowflake.ID, ruleDetail string, alertLevel vobj.AlertLevel, alertPages []string, order int32) error {
+	rule, err := s.ruleRepo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("strategy rule %s not found", uid)
+		}
+		return merr.ErrorInternal("get strategy rule failed").WithCause(err)
+	}
+
+	if ruleDetail != "" {
+		rule.UpdateRuleDetail(ruleDetail)
+	}
+	if alertLevel != 0 {
+		rule.UpdateAlertLevel(alertLevel)
+	}
+	if alertPages != nil {
+		rule.UpdateAlertPages(alertPages)
+	}
+	if order >= 0 {
+		rule.UpdateOrder(order)
+	}
+
+	if err := s.ruleRepo.Save(ctx, rule); err != nil {
+		s.helper.Errorw("msg", "update strategy rule failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update strategy rule %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) DeleteStrategyRule(ctx context.Context, uid snowflake.ID) error {
+	if err := s.ruleRepo.Delete(ctx, uid); err != nil {
+		s.helper.Errorw("msg", "delete strategy rule failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("delete strategy rule %s failed", uid).WithCause(err)
+	}
+	return nil
+}
+
+func (s *Service) GetStrategyRule(ctx context.Context, uid snowflake.ID) (*StrategyRule, error) {
+	rule, err := s.ruleRepo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return nil, merr.ErrorNotFound("strategy rule %s not found", uid)
+		}
+		s.helper.Errorw("msg", "get strategy rule failed", "error", err, "uid", uid)
+		return nil, merr.ErrorInternal("get strategy rule %s failed", uid).WithCause(err)
+	}
+	return rule, nil
+}
+
+func (s *Service) ListStrategyRule(ctx context.Context, strategyUID snowflake.ID, status vobj.GlobalStatus) ([]*StrategyRule, error) {
+	rules, err := s.ruleRepo.List(ctx, strategyUID, status)
+	if err != nil {
+		s.helper.Errorw("msg", "list strategy rule failed", "error", err, "strategyUID", strategyUID)
+		return nil, merr.ErrorInternal("list strategy rule failed").WithCause(err)
+	}
+	return rules, nil
+}
+
+func (s *Service) UpdateStrategyRuleStatus(ctx context.Context, uid snowflake.ID, status vobj.GlobalStatus) error {
+	rule, err := s.ruleRepo.FindByID(ctx, uid)
+	if err != nil {
+		if merr.IsNotFound(err) {
+			return merr.ErrorNotFound("strategy rule %s not found", uid)
+		}
+		return merr.ErrorInternal("get strategy rule failed").WithCause(err)
+	}
+
+	if status == vobj.GlobalStatusEnabled {
+		if err := rule.Enable(); err != nil {
+			return err
+		}
+	} else {
+		if err := rule.Disable(); err != nil {
+			return err
+		}
+	}
+
+	if err := s.ruleRepo.Save(ctx, rule); err != nil {
+		s.helper.Errorw("msg", "update strategy rule status failed", "error", err, "uid", uid)
+		return merr.ErrorInternal("update strategy rule status %s failed", uid).WithCause(err)
 	}
 	return nil
 }

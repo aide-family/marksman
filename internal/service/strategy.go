@@ -322,37 +322,85 @@ func (s *StrategyService) ListReceiver(ctx context.Context, req *apiv1.ListRecei
 	return toAPIV1ListReceiverReply(page), nil
 }
 
-// 策略规则相关接口实现（占位实现，需要后续完善 biz 层）
+// 策略规则相关接口实现
 func (s *StrategyService) CreateStrategyRule(ctx context.Context, req *apiv1.CreateStrategyRuleRequest) (*apiv1.CreateStrategyRuleReply, error) {
-	// TODO: 实现创建策略规则逻辑
+	alertPages := make([]string, 0, len(req.AlertPages))
+	alertPages = append(alertPages, req.AlertPages...)
+	if err := s.strategyService.CreateStrategyRule(ctx, snowflake.ParseInt64(req.StrategyUid), req.RuleDetail, vobj.AlertLevel(req.AlertLevel), alertPages, req.Order); err != nil {
+		return nil, err
+	}
 	return &apiv1.CreateStrategyRuleReply{}, nil
 }
 
 func (s *StrategyService) UpdateStrategyRule(ctx context.Context, req *apiv1.UpdateStrategyRuleRequest) (*apiv1.UpdateStrategyRuleReply, error) {
-	// TODO: 实现更新策略规则逻辑
+	alertPages := make([]string, 0, len(req.AlertPages))
+	alertPages = append(alertPages, req.AlertPages...)
+	if err := s.strategyService.UpdateStrategyRule(ctx, snowflake.ParseInt64(req.Uid), req.RuleDetail, vobj.AlertLevel(req.AlertLevel), alertPages, req.Order); err != nil {
+		return nil, err
+	}
 	return &apiv1.UpdateStrategyRuleReply{}, nil
 }
 
 func (s *StrategyService) DeleteStrategyRule(ctx context.Context, req *apiv1.DeleteStrategyRuleRequest) (*apiv1.DeleteStrategyRuleReply, error) {
-	// TODO: 实现删除策略规则逻辑
+	if err := s.strategyService.DeleteStrategyRule(ctx, snowflake.ParseInt64(req.Uid)); err != nil {
+		return nil, err
+	}
 	return &apiv1.DeleteStrategyRuleReply{}, nil
 }
 
 func (s *StrategyService) GetStrategyRule(ctx context.Context, req *apiv1.GetStrategyRuleRequest) (*apiv1.StrategyRuleItem, error) {
-	// TODO: 实现获取策略规则逻辑
-	return &apiv1.StrategyRuleItem{}, nil
+	rule, err := s.strategyService.GetStrategyRule(ctx, snowflake.ParseInt64(req.Uid))
+	if err != nil {
+		return nil, err
+	}
+	return toAPIV1StrategyRuleItem(rule), nil
 }
 
 func (s *StrategyService) ListStrategyRule(ctx context.Context, req *apiv1.ListStrategyRuleRequest) (*apiv1.ListStrategyRuleReply, error) {
-	// TODO: 实现列表查询策略规则逻辑
+	rules, err := s.strategyService.ListStrategyRule(ctx, snowflake.ParseInt64(req.StrategyUid), vobj.GlobalStatus(req.Status))
+	if err != nil {
+		return nil, err
+	}
+	items := make([]*apiv1.StrategyRuleItem, 0, len(rules))
+	for _, rule := range rules {
+		items = append(items, toAPIV1StrategyRuleItem(rule))
+	}
 	return &apiv1.ListStrategyRuleReply{
-		Rules: []*apiv1.StrategyRuleItem{},
+		Rules: items,
 	}, nil
 }
 
 func (s *StrategyService) UpdateStrategyRuleStatus(ctx context.Context, req *apiv1.UpdateStrategyRuleStatusRequest) (*apiv1.UpdateStrategyRuleStatusReply, error) {
-	// TODO: 实现更新策略规则状态逻辑
+	if err := s.strategyService.UpdateStrategyRuleStatus(ctx, snowflake.ParseInt64(req.Uid), vobj.GlobalStatus(req.Status)); err != nil {
+		return nil, err
+	}
 	return &apiv1.UpdateStrategyRuleStatusReply{}, nil
+}
+
+// toAPIV1StrategyRuleItem converts strategy rule entity to API response
+func toAPIV1StrategyRuleItem(r *strategy.StrategyRule) *apiv1.StrategyRuleItem {
+	return &apiv1.StrategyRuleItem{
+		Uid:        r.UID().Int64(),
+		StrategyUid: r.StrategyUID().Int64(),
+		RuleDetail: r.RuleDetail(),
+		Status:     enum.GlobalStatus(r.Status()),
+		AlertLevel: int32(r.AlertLevel()),
+		AlertPages: r.AlertPages(),
+		Order:      r.Order(),
+		CreatedAt:  r.CreatedAt().Unix(),
+		UpdatedAt:  r.UpdatedAt().Unix(),
+	}
+}
+
+// toAPIV1ListStrategyRuleReply converts strategy rule list to API response
+func toAPIV1ListStrategyRuleReply(rules []*strategy.StrategyRule) *apiv1.ListStrategyRuleReply {
+	items := make([]*apiv1.StrategyRuleItem, 0, len(rules))
+	for _, r := range rules {
+		items = append(items, toAPIV1StrategyRuleItem(r))
+	}
+	return &apiv1.ListStrategyRuleReply{
+		Rules: items,
+	}
 }
 
 // 策略详细配置更新接口实现
@@ -436,4 +484,5 @@ func toAPIV1ListReceiverReply(page *shared.Page[*strategy.Receiver]) *apiv1.List
 		Total:     page.Total,
 	}
 }
+
 
