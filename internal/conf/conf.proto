@@ -9,7 +9,7 @@ import "enum/enum.proto";
 option go_package = "github.com/aide-family/sovereign/internal/conf;conf";
 
 message Bootstrap {
-	sovereign.enum.Environment environment = 1;
+	enums.Environment environment = 1;
 	Server server = 2;
 	JWT jwt = 3;
 	sovereign.config.BasicAuthConfig swaggerBasicAuth = 4;

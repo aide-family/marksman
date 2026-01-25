@@ -23,7 +23,7 @@ message DataSourceModel {
     string type = 4;
     string engine = 5;
     string name = 6;
-    sovereign.enum.GlobalStatus status = 7;
+    enums.GlobalStatus status = 7;
     string endpoint = 8;
     string description = 9;
     map<string, string> config = 10;
@@ -46,7 +46,7 @@ message CreateDataSourceRequest {
     string type = 2;
     string engine = 3;
     string name = 4;
-    sovereign.enum.GlobalStatus status = 5;
+    enums.GlobalStatus status = 5;
     string endpoint = 6;
     string description = 7;
     map<string, string> config = 8;
@@ -60,7 +60,7 @@ message GetDataSourceRequest {
 message UpdateDataSourceRequest {
     int64 uid = 1;
     string name = 2;
-    sovereign.enum.GlobalStatus status = 3;
+    enums.GlobalStatus status = 3;
     string endpoint = 4;
     string description = 5;
     map<string, string> config = 6;
@@ -100,7 +100,7 @@ message ListDataSourceRequest {
     int32 page = 1;
     int32 pageSize = 2;
     string keyword = 3;
-    sovereign.enum.GlobalStatus status = 4;
+    enums.GlobalStatus status = 4;
     string type = 5;
     string engine = 6;
     int64 namespaceUid = 7;
@@ -119,7 +119,7 @@ message SelectDataSourceRequest {
     string keyword = 1;
     int32 limit = 2;
     int64 nextUID = 3;
-    sovereign.enum.GlobalStatus status = 4;
+    enums.GlobalStatus status = 4;
     string type = 5;
     string engine = 6;
     int64 namespaceUid = 7;
@@ -135,5 +135,5 @@ message SelectDataSourceResponse {
 
 message UpdateDataSourceStatusRequest {
     int64 uid = 1;
-    sovereign.enum.GlobalStatus status = 2;
+    enums.GlobalStatus status = 2;
 }

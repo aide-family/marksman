@@ -127,7 +127,7 @@ func toAPIV1SelectStrategyReply(result *strategy.SelectResult) *apiv1.SelectStra
 	selectItems := make([]*apiv1.SelectItem, 0, len(result.Items))
 	for _, item := range result.Items {
 		selectItems = append(selectItems, &apiv1.SelectItem{
-			Value:    item.UID.Int64(),
+			Value:    item.UID.String(),
 			Label:    item.Name,
 			Disabled: item.Disabled,
 			Tooltip:  item.Tooltip,

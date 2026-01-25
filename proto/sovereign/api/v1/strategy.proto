@@ -5,6 +5,7 @@ package sovereign.api.v1;
 import "google/api/annotations.proto";
 import "buf/validate/validate.proto";
 import "enum/enum.proto";
+import "api/v1/common.proto";
 
 option go_package = "github.com/aide-family/sovereign/pkg/api/v1;v1";
 option java_multiple_files = true;
@@ -92,6 +93,7 @@ service Strategy {
 	rpc AddStrategyToGroup (AddStrategyToGroupRequest) returns (AddStrategyToGroupReply) {
 		option (google.api.http) = {
 			post: "/v1/strategy/group/{group_uid}/strategy/{strategy_uid}"
+			body: "*"
 		};
 	}
 	rpc RemoveStrategyFromGroup (RemoveStrategyFromGroupRequest) returns (RemoveStrategyFromGroupReply) {
@@ -230,7 +232,7 @@ message UpdateStrategyReply {}
 
 message UpdateStrategyStatusRequest {
 	int64 uid = 1 [(buf.validate.field).required = true];
-	enum.GlobalStatus status = 2 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateStrategyStatusReply {}
@@ -252,7 +254,7 @@ message StrategyItem {
 	string type = 4;
 	string name = 5;
 	string description = 6;
-	enum.GlobalStatus status = 7;
+	enums.GlobalStatus status = 7;
 	int64 created_at = 8;
 	int64 updated_at = 9;
 }
@@ -264,7 +266,7 @@ message ListStrategyRequest {
 	int64 group_uid = 4;
 	string type = 5;
 	string keyword = 6;
-	enum.GlobalStatus status = 7;
+	enums.GlobalStatus status = 7;
 }
 
 message ListStrategyReply {
@@ -277,7 +279,7 @@ message SelectStrategyRequest {
 	string keyword = 2;
 	int32 limit = 3;
 	int64 next_uid = 4;
-	enum.GlobalStatus status = 5;
+	enums.GlobalStatus status = 5;
 }
 
 message SelectStrategyReply {
@@ -287,12 +289,7 @@ message SelectStrategyReply {
 	bool has_more = 4;
 }
 
-message SelectItem {
-	string value = 1;
-	string label = 2;
-	bool disabled = 3;
-	string tooltip = 4;
-}
+// SelectItem 定义在 common.proto 中
 
 // 策略分组相关消息
 message CreateStrategyGroupRequest {
@@ -313,7 +310,7 @@ message UpdateStrategyGroupReply {}
 
 message UpdateStrategyGroupStatusRequest {
 	int64 uid = 1 [(buf.validate.field).required = true];
-	enum.GlobalStatus status = 2 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateStrategyGroupStatusReply {}
@@ -333,7 +330,7 @@ message StrategyGroupItem {
 	int64 namespace_uid = 2;
 	string name = 3;
 	string description = 4;
-	enum.GlobalStatus status = 5;
+	enums.GlobalStatus status = 5;
 	int32 upgrade_mode = 6;
 	string upgrade_config = 7;
 	int64 created_at = 8;
@@ -345,7 +342,7 @@ message ListStrategyGroupRequest {
 	int32 page_size = 2;
 	int64 namespace_uid = 3;
 	string keyword = 4;
-	enum.GlobalStatus status = 5;
+	enums.GlobalStatus status = 5;
 }
 
 message ListStrategyGroupReply {
@@ -358,7 +355,7 @@ message GetGroupStrategiesRequest {
 	int32 page = 2;
 	int32 page_size = 3;
 	string keyword = 4;
-	enum.GlobalStatus status = 5;
+	enums.GlobalStatus status = 5;
 }
 
 message AddStrategyToGroupRequest {
@@ -485,7 +482,7 @@ message StrategyRuleItem {
 	int64 uid = 1;
 	int64 strategy_uid = 2;
 	string rule_detail = 3;
-	enum.GlobalStatus status = 4;
+	enums.GlobalStatus status = 4;
 	int32 alert_level = 5;
 	repeated string alert_pages = 6;
 	int32 order = 7;
@@ -495,7 +492,7 @@ message StrategyRuleItem {
 
 message ListStrategyRuleRequest {
 	int64 strategy_uid = 1 [(buf.validate.field).required = true];
-	enum.GlobalStatus status = 2;
+	enums.GlobalStatus status = 2;
 }
 
 message ListStrategyRuleReply {
@@ -504,7 +501,7 @@ message ListStrategyRuleReply {
 
 message UpdateStrategyRuleStatusRequest {
 	int64 uid = 1 [(buf.validate.field).required = true];
-	enum.GlobalStatus status = 2 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateStrategyRuleStatusReply {}

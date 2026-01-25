@@ -19,23 +19,67 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationDataSourceApplyAlertTemplate = "/sovereign.api.v1.DataSource/ApplyAlertTemplate"
+const OperationDataSourceCreateAlertTemplate = "/sovereign.api.v1.DataSource/CreateAlertTemplate"
 const OperationDataSourceCreateDataSource = "/sovereign.api.v1.DataSource/CreateDataSource"
+const OperationDataSourceCreateDataSourceProxy = "/sovereign.api.v1.DataSource/CreateDataSourceProxy"
+const OperationDataSourceDeleteAlertTemplate = "/sovereign.api.v1.DataSource/DeleteAlertTemplate"
 const OperationDataSourceDeleteDataSource = "/sovereign.api.v1.DataSource/DeleteDataSource"
+const OperationDataSourceDeleteDataSourceProxy = "/sovereign.api.v1.DataSource/DeleteDataSourceProxy"
+const OperationDataSourceDeleteQueryFavorite = "/sovereign.api.v1.DataSource/DeleteQueryFavorite"
+const OperationDataSourceGetAlertTemplate = "/sovereign.api.v1.DataSource/GetAlertTemplate"
 const OperationDataSourceGetDataSource = "/sovereign.api.v1.DataSource/GetDataSource"
+const OperationDataSourceGetDataSourceMetadata = "/sovereign.api.v1.DataSource/GetDataSourceMetadata"
+const OperationDataSourceGetDataSourceProxy = "/sovereign.api.v1.DataSource/GetDataSourceProxy"
+const OperationDataSourceListAlertTemplate = "/sovereign.api.v1.DataSource/ListAlertTemplate"
 const OperationDataSourceListDataSource = "/sovereign.api.v1.DataSource/ListDataSource"
+const OperationDataSourceListDataSourceMetadata = "/sovereign.api.v1.DataSource/ListDataSourceMetadata"
+const OperationDataSourceListDataSourceProxy = "/sovereign.api.v1.DataSource/ListDataSourceProxy"
+const OperationDataSourceListQueryFavorites = "/sovereign.api.v1.DataSource/ListQueryFavorites"
+const OperationDataSourceListQueryHistory = "/sovereign.api.v1.DataSource/ListQueryHistory"
+const OperationDataSourceQueryDataSource = "/sovereign.api.v1.DataSource/QueryDataSource"
+const OperationDataSourceRefreshDataSourceMetadata = "/sovereign.api.v1.DataSource/RefreshDataSourceMetadata"
+const OperationDataSourceSaveQueryFavorite = "/sovereign.api.v1.DataSource/SaveQueryFavorite"
 const OperationDataSourceSelectDataSource = "/sovereign.api.v1.DataSource/SelectDataSource"
 const OperationDataSourceTestConnection = "/sovereign.api.v1.DataSource/TestConnection"
+const OperationDataSourceUpdateAlertTemplate = "/sovereign.api.v1.DataSource/UpdateAlertTemplate"
+const OperationDataSourceUpdateAlertTemplateStatus = "/sovereign.api.v1.DataSource/UpdateAlertTemplateStatus"
 const OperationDataSourceUpdateDataSource = "/sovereign.api.v1.DataSource/UpdateDataSource"
+const OperationDataSourceUpdateDataSourceProxy = "/sovereign.api.v1.DataSource/UpdateDataSourceProxy"
 const OperationDataSourceUpdateDataSourceStatus = "/sovereign.api.v1.DataSource/UpdateDataSourceStatus"
 
 type DataSourceHTTPServer interface {
+	ApplyAlertTemplate(context.Context, *ApplyAlertTemplateRequest) (*ApplyAlertTemplateReply, error)
+	// CreateAlertTemplate 告警模板相关接口
+	CreateAlertTemplate(context.Context, *CreateAlertTemplateRequest) (*CreateAlertTemplateReply, error)
 	CreateDataSource(context.Context, *CreateDataSourceRequest) (*CreateDataSourceReply, error)
+	// CreateDataSourceProxy 数据源代理相关接口
+	CreateDataSourceProxy(context.Context, *CreateDataSourceProxyRequest) (*CreateDataSourceProxyReply, error)
+	DeleteAlertTemplate(context.Context, *DeleteAlertTemplateRequest) (*DeleteAlertTemplateReply, error)
 	DeleteDataSource(context.Context, *DeleteDataSourceRequest) (*DeleteDataSourceReply, error)
+	DeleteDataSourceProxy(context.Context, *DeleteDataSourceProxyRequest) (*DeleteDataSourceProxyReply, error)
+	DeleteQueryFavorite(context.Context, *DeleteQueryFavoriteRequest) (*DeleteQueryFavoriteReply, error)
+	GetAlertTemplate(context.Context, *GetAlertTemplateRequest) (*AlertTemplateItem, error)
 	GetDataSource(context.Context, *GetDataSourceRequest) (*DataSourceItem, error)
+	GetDataSourceMetadata(context.Context, *GetDataSourceMetadataRequest) (*DataSourceMetadataItem, error)
+	GetDataSourceProxy(context.Context, *GetDataSourceProxyRequest) (*DataSourceProxyItem, error)
+	ListAlertTemplate(context.Context, *ListAlertTemplateRequest) (*ListAlertTemplateReply, error)
 	ListDataSource(context.Context, *ListDataSourceRequest) (*ListDataSourceReply, error)
+	// ListDataSourceMetadata 元数据管理相关接口
+	ListDataSourceMetadata(context.Context, *ListDataSourceMetadataRequest) (*ListDataSourceMetadataReply, error)
+	ListDataSourceProxy(context.Context, *ListDataSourceProxyRequest) (*ListDataSourceProxyReply, error)
+	ListQueryFavorites(context.Context, *ListQueryFavoritesRequest) (*ListQueryFavoritesReply, error)
+	ListQueryHistory(context.Context, *ListQueryHistoryRequest) (*ListQueryHistoryReply, error)
+	// QueryDataSource 及时查询相关接口
+	QueryDataSource(context.Context, *QueryDataSourceRequest) (*QueryDataSourceReply, error)
+	RefreshDataSourceMetadata(context.Context, *RefreshDataSourceMetadataRequest) (*RefreshDataSourceMetadataReply, error)
+	SaveQueryFavorite(context.Context, *SaveQueryFavoriteRequest) (*SaveQueryFavoriteReply, error)
 	SelectDataSource(context.Context, *SelectDataSourceRequest) (*SelectDataSourceReply, error)
 	TestConnection(context.Context, *TestConnectionRequest) (*TestConnectionReply, error)
+	UpdateAlertTemplate(context.Context, *UpdateAlertTemplateRequest) (*UpdateAlertTemplateReply, error)
+	UpdateAlertTemplateStatus(context.Context, *UpdateAlertTemplateStatusRequest) (*UpdateAlertTemplateStatusReply, error)
 	UpdateDataSource(context.Context, *UpdateDataSourceRequest) (*UpdateDataSourceReply, error)
+	UpdateDataSourceProxy(context.Context, *UpdateDataSourceProxyRequest) (*UpdateDataSourceProxyReply, error)
 	UpdateDataSourceStatus(context.Context, *UpdateDataSourceStatusRequest) (*UpdateDataSourceStatusReply, error)
 }
 
@@ -49,6 +93,26 @@ func RegisterDataSourceHTTPServer(s *http.Server, srv DataSourceHTTPServer) {
 	r.GET("/v1/datasources", _DataSource_ListDataSource0_HTTP_Handler(srv))
 	r.GET("/v1/datasources/select", _DataSource_SelectDataSource0_HTTP_Handler(srv))
 	r.POST("/v1/datasource/{uid}/test", _DataSource_TestConnection0_HTTP_Handler(srv))
+	r.POST("/v1/datasource/{uid}/query", _DataSource_QueryDataSource0_HTTP_Handler(srv))
+	r.GET("/v1/datasource/{uid}/query/history", _DataSource_ListQueryHistory0_HTTP_Handler(srv))
+	r.POST("/v1/datasource/{uid}/query/favorite", _DataSource_SaveQueryFavorite0_HTTP_Handler(srv))
+	r.GET("/v1/datasource/{uid}/query/favorites", _DataSource_ListQueryFavorites0_HTTP_Handler(srv))
+	r.DELETE("/v1/datasource/{uid}/query/favorite/{favorite_id}", _DataSource_DeleteQueryFavorite0_HTTP_Handler(srv))
+	r.POST("/v1/datasource/{datasource_uid}/alert-template", _DataSource_CreateAlertTemplate0_HTTP_Handler(srv))
+	r.PUT("/v1/datasource/alert-template/{uid}", _DataSource_UpdateAlertTemplate0_HTTP_Handler(srv))
+	r.DELETE("/v1/datasource/alert-template/{uid}", _DataSource_DeleteAlertTemplate0_HTTP_Handler(srv))
+	r.GET("/v1/datasource/alert-template/{uid}", _DataSource_GetAlertTemplate0_HTTP_Handler(srv))
+	r.GET("/v1/datasource/{datasource_uid}/alert-templates", _DataSource_ListAlertTemplate0_HTTP_Handler(srv))
+	r.PUT("/v1/datasource/alert-template/{uid}/status", _DataSource_UpdateAlertTemplateStatus0_HTTP_Handler(srv))
+	r.POST("/v1/datasource/alert-template/{uid}/apply", _DataSource_ApplyAlertTemplate0_HTTP_Handler(srv))
+	r.POST("/v1/datasource/proxy", _DataSource_CreateDataSourceProxy0_HTTP_Handler(srv))
+	r.PUT("/v1/datasource/proxy/{uid}", _DataSource_UpdateDataSourceProxy0_HTTP_Handler(srv))
+	r.DELETE("/v1/datasource/proxy/{uid}", _DataSource_DeleteDataSourceProxy0_HTTP_Handler(srv))
+	r.GET("/v1/datasource/proxy/{uid}", _DataSource_GetDataSourceProxy0_HTTP_Handler(srv))
+	r.GET("/v1/datasource/proxies", _DataSource_ListDataSourceProxy0_HTTP_Handler(srv))
+	r.GET("/v1/datasource/{uid}/metadata", _DataSource_ListDataSourceMetadata0_HTTP_Handler(srv))
+	r.GET("/v1/datasource/{uid}/metadata/{metric_name}", _DataSource_GetDataSourceMetadata0_HTTP_Handler(srv))
+	r.POST("/v1/datasource/{uid}/metadata/refresh", _DataSource_RefreshDataSourceMetadata0_HTTP_Handler(srv))
 }
 
 func _DataSource_CreateDataSource0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
@@ -208,6 +272,9 @@ func _DataSource_SelectDataSource0_HTTP_Handler(srv DataSourceHTTPServer) func(c
 func _DataSource_TestConnection0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in TestConnectionRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -227,14 +294,499 @@ func _DataSource_TestConnection0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx
 	}
 }
 
+func _DataSource_QueryDataSource0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in QueryDataSourceRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceQueryDataSource)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.QueryDataSource(ctx, req.(*QueryDataSourceRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*QueryDataSourceReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_ListQueryHistory0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListQueryHistoryRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceListQueryHistory)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListQueryHistory(ctx, req.(*ListQueryHistoryRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListQueryHistoryReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_SaveQueryFavorite0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SaveQueryFavoriteRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceSaveQueryFavorite)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SaveQueryFavorite(ctx, req.(*SaveQueryFavoriteRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SaveQueryFavoriteReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_ListQueryFavorites0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListQueryFavoritesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceListQueryFavorites)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListQueryFavorites(ctx, req.(*ListQueryFavoritesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListQueryFavoritesReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_DeleteQueryFavorite0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteQueryFavoriteRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceDeleteQueryFavorite)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteQueryFavorite(ctx, req.(*DeleteQueryFavoriteRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteQueryFavoriteReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_CreateAlertTemplate0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateAlertTemplateRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceCreateAlertTemplate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateAlertTemplate(ctx, req.(*CreateAlertTemplateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateAlertTemplateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_UpdateAlertTemplate0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateAlertTemplateRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceUpdateAlertTemplate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateAlertTemplate(ctx, req.(*UpdateAlertTemplateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateAlertTemplateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_DeleteAlertTemplate0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteAlertTemplateRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceDeleteAlertTemplate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteAlertTemplate(ctx, req.(*DeleteAlertTemplateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteAlertTemplateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_GetAlertTemplate0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetAlertTemplateRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceGetAlertTemplate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetAlertTemplate(ctx, req.(*GetAlertTemplateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AlertTemplateItem)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_ListAlertTemplate0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListAlertTemplateRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceListAlertTemplate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListAlertTemplate(ctx, req.(*ListAlertTemplateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListAlertTemplateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_UpdateAlertTemplateStatus0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateAlertTemplateStatusRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceUpdateAlertTemplateStatus)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateAlertTemplateStatus(ctx, req.(*UpdateAlertTemplateStatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateAlertTemplateStatusReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_ApplyAlertTemplate0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ApplyAlertTemplateRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceApplyAlertTemplate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ApplyAlertTemplate(ctx, req.(*ApplyAlertTemplateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ApplyAlertTemplateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_CreateDataSourceProxy0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateDataSourceProxyRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceCreateDataSourceProxy)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateDataSourceProxy(ctx, req.(*CreateDataSourceProxyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateDataSourceProxyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_UpdateDataSourceProxy0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateDataSourceProxyRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceUpdateDataSourceProxy)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateDataSourceProxy(ctx, req.(*UpdateDataSourceProxyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateDataSourceProxyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_DeleteDataSourceProxy0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteDataSourceProxyRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceDeleteDataSourceProxy)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteDataSourceProxy(ctx, req.(*DeleteDataSourceProxyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteDataSourceProxyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_GetDataSourceProxy0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDataSourceProxyRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceGetDataSourceProxy)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDataSourceProxy(ctx, req.(*GetDataSourceProxyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DataSourceProxyItem)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_ListDataSourceProxy0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListDataSourceProxyRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceListDataSourceProxy)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListDataSourceProxy(ctx, req.(*ListDataSourceProxyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListDataSourceProxyReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_ListDataSourceMetadata0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListDataSourceMetadataRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceListDataSourceMetadata)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListDataSourceMetadata(ctx, req.(*ListDataSourceMetadataRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListDataSourceMetadataReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_GetDataSourceMetadata0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDataSourceMetadataRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceGetDataSourceMetadata)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDataSourceMetadata(ctx, req.(*GetDataSourceMetadataRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DataSourceMetadataItem)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _DataSource_RefreshDataSourceMetadata0_HTTP_Handler(srv DataSourceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in RefreshDataSourceMetadataRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationDataSourceRefreshDataSourceMetadata)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.RefreshDataSourceMetadata(ctx, req.(*RefreshDataSourceMetadataRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*RefreshDataSourceMetadataReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type DataSourceHTTPClient interface {
+	ApplyAlertTemplate(ctx context.Context, req *ApplyAlertTemplateRequest, opts ...http.CallOption) (rsp *ApplyAlertTemplateReply, err error)
+	// CreateAlertTemplate 告警模板相关接口
+	CreateAlertTemplate(ctx context.Context, req *CreateAlertTemplateRequest, opts ...http.CallOption) (rsp *CreateAlertTemplateReply, err error)
 	CreateDataSource(ctx context.Context, req *CreateDataSourceRequest, opts ...http.CallOption) (rsp *CreateDataSourceReply, err error)
+	// CreateDataSourceProxy 数据源代理相关接口
+	CreateDataSourceProxy(ctx context.Context, req *CreateDataSourceProxyRequest, opts ...http.CallOption) (rsp *CreateDataSourceProxyReply, err error)
+	DeleteAlertTemplate(ctx context.Context, req *DeleteAlertTemplateRequest, opts ...http.CallOption) (rsp *DeleteAlertTemplateReply, err error)
 	DeleteDataSource(ctx context.Context, req *DeleteDataSourceRequest, opts ...http.CallOption) (rsp *DeleteDataSourceReply, err error)
+	DeleteDataSourceProxy(ctx context.Context, req *DeleteDataSourceProxyRequest, opts ...http.CallOption) (rsp *DeleteDataSourceProxyReply, err error)
+	DeleteQueryFavorite(ctx context.Context, req *DeleteQueryFavoriteRequest, opts ...http.CallOption) (rsp *DeleteQueryFavoriteReply, err error)
+	GetAlertTemplate(ctx context.Context, req *GetAlertTemplateRequest, opts ...http.CallOption) (rsp *AlertTemplateItem, err error)
 	GetDataSource(ctx context.Context, req *GetDataSourceRequest, opts ...http.CallOption) (rsp *DataSourceItem, err error)
+	GetDataSourceMetadata(ctx context.Context, req *GetDataSourceMetadataRequest, opts ...http.CallOption) (rsp *DataSourceMetadataItem, err error)
+	GetDataSourceProxy(ctx context.Context, req *GetDataSourceProxyRequest, opts ...http.CallOption) (rsp *DataSourceProxyItem, err error)
+	ListAlertTemplate(ctx context.Context, req *ListAlertTemplateRequest, opts ...http.CallOption) (rsp *ListAlertTemplateReply, err error)
 	ListDataSource(ctx context.Context, req *ListDataSourceRequest, opts ...http.CallOption) (rsp *ListDataSourceReply, err error)
+	// ListDataSourceMetadata 元数据管理相关接口
+	ListDataSourceMetadata(ctx context.Context, req *ListDataSourceMetadataRequest, opts ...http.CallOption) (rsp *ListDataSourceMetadataReply, err error)
+	ListDataSourceProxy(ctx context.Context, req *ListDataSourceProxyRequest, opts ...http.CallOption) (rsp *ListDataSourceProxyReply, err error)
+	ListQueryFavorites(ctx context.Context, req *ListQueryFavoritesRequest, opts ...http.CallOption) (rsp *ListQueryFavoritesReply, err error)
+	ListQueryHistory(ctx context.Context, req *ListQueryHistoryRequest, opts ...http.CallOption) (rsp *ListQueryHistoryReply, err error)
+	// QueryDataSource 及时查询相关接口
+	QueryDataSource(ctx context.Context, req *QueryDataSourceRequest, opts ...http.CallOption) (rsp *QueryDataSourceReply, err error)
+	RefreshDataSourceMetadata(ctx context.Context, req *RefreshDataSourceMetadataRequest, opts ...http.CallOption) (rsp *RefreshDataSourceMetadataReply, err error)
+	SaveQueryFavorite(ctx context.Context, req *SaveQueryFavoriteRequest, opts ...http.CallOption) (rsp *SaveQueryFavoriteReply, err error)
 	SelectDataSource(ctx context.Context, req *SelectDataSourceRequest, opts ...http.CallOption) (rsp *SelectDataSourceReply, err error)
 	TestConnection(ctx context.Context, req *TestConnectionRequest, opts ...http.CallOption) (rsp *TestConnectionReply, err error)
+	UpdateAlertTemplate(ctx context.Context, req *UpdateAlertTemplateRequest, opts ...http.CallOption) (rsp *UpdateAlertTemplateReply, err error)
+	UpdateAlertTemplateStatus(ctx context.Context, req *UpdateAlertTemplateStatusRequest, opts ...http.CallOption) (rsp *UpdateAlertTemplateStatusReply, err error)
 	UpdateDataSource(ctx context.Context, req *UpdateDataSourceRequest, opts ...http.CallOption) (rsp *UpdateDataSourceReply, err error)
+	UpdateDataSourceProxy(ctx context.Context, req *UpdateDataSourceProxyRequest, opts ...http.CallOption) (rsp *UpdateDataSourceProxyReply, err error)
 	UpdateDataSourceStatus(ctx context.Context, req *UpdateDataSourceStatusRequest, opts ...http.CallOption) (rsp *UpdateDataSourceStatusReply, err error)
 }
 
@@ -246,6 +798,33 @@ func NewDataSourceHTTPClient(client *http.Client) DataSourceHTTPClient {
 	return &DataSourceHTTPClientImpl{client}
 }
 
+func (c *DataSourceHTTPClientImpl) ApplyAlertTemplate(ctx context.Context, in *ApplyAlertTemplateRequest, opts ...http.CallOption) (*ApplyAlertTemplateReply, error) {
+	var out ApplyAlertTemplateReply
+	pattern := "/v1/datasource/alert-template/{uid}/apply"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationDataSourceApplyAlertTemplate))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// CreateAlertTemplate 告警模板相关接口
+func (c *DataSourceHTTPClientImpl) CreateAlertTemplate(ctx context.Context, in *CreateAlertTemplateRequest, opts ...http.CallOption) (*CreateAlertTemplateReply, error) {
+	var out CreateAlertTemplateReply
+	pattern := "/v1/datasource/{datasource_uid}/alert-template"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationDataSourceCreateAlertTemplate))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *DataSourceHTTPClientImpl) CreateDataSource(ctx context.Context, in *CreateDataSourceRequest, opts ...http.CallOption) (*CreateDataSourceReply, error) {
 	var out CreateDataSourceReply
 	pattern := "/v1/datasource"
@@ -253,6 +832,33 @@ func (c *DataSourceHTTPClientImpl) CreateDataSource(ctx context.Context, in *Cre
 	opts = append(opts, http.Operation(OperationDataSourceCreateDataSource))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// CreateDataSourceProxy 数据源代理相关接口
+func (c *DataSourceHTTPClientImpl) CreateDataSourceProxy(ctx context.Context, in *CreateDataSourceProxyRequest, opts ...http.CallOption) (*CreateDataSourceProxyReply, error) {
+	var out CreateDataSourceProxyReply
+	pattern := "/v1/datasource/proxy"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationDataSourceCreateDataSourceProxy))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) DeleteAlertTemplate(ctx context.Context, in *DeleteAlertTemplateRequest, opts ...http.CallOption) (*DeleteAlertTemplateReply, error) {
+	var out DeleteAlertTemplateReply
+	pattern := "/v1/datasource/alert-template/{uid}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceDeleteAlertTemplate))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -272,11 +878,89 @@ func (c *DataSourceHTTPClientImpl) DeleteDataSource(ctx context.Context, in *Del
 	return &out, nil
 }
 
+func (c *DataSourceHTTPClientImpl) DeleteDataSourceProxy(ctx context.Context, in *DeleteDataSourceProxyRequest, opts ...http.CallOption) (*DeleteDataSourceProxyReply, error) {
+	var out DeleteDataSourceProxyReply
+	pattern := "/v1/datasource/proxy/{uid}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceDeleteDataSourceProxy))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) DeleteQueryFavorite(ctx context.Context, in *DeleteQueryFavoriteRequest, opts ...http.CallOption) (*DeleteQueryFavoriteReply, error) {
+	var out DeleteQueryFavoriteReply
+	pattern := "/v1/datasource/{uid}/query/favorite/{favorite_id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceDeleteQueryFavorite))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) GetAlertTemplate(ctx context.Context, in *GetAlertTemplateRequest, opts ...http.CallOption) (*AlertTemplateItem, error) {
+	var out AlertTemplateItem
+	pattern := "/v1/datasource/alert-template/{uid}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceGetAlertTemplate))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *DataSourceHTTPClientImpl) GetDataSource(ctx context.Context, in *GetDataSourceRequest, opts ...http.CallOption) (*DataSourceItem, error) {
 	var out DataSourceItem
 	pattern := "/v1/datasource/{uid}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationDataSourceGetDataSource))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) GetDataSourceMetadata(ctx context.Context, in *GetDataSourceMetadataRequest, opts ...http.CallOption) (*DataSourceMetadataItem, error) {
+	var out DataSourceMetadataItem
+	pattern := "/v1/datasource/{uid}/metadata/{metric_name}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceGetDataSourceMetadata))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) GetDataSourceProxy(ctx context.Context, in *GetDataSourceProxyRequest, opts ...http.CallOption) (*DataSourceProxyItem, error) {
+	var out DataSourceProxyItem
+	pattern := "/v1/datasource/proxy/{uid}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceGetDataSourceProxy))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) ListAlertTemplate(ctx context.Context, in *ListAlertTemplateRequest, opts ...http.CallOption) (*ListAlertTemplateReply, error) {
+	var out ListAlertTemplateReply
+	pattern := "/v1/datasource/{datasource_uid}/alert-templates"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceListAlertTemplate))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -292,6 +976,99 @@ func (c *DataSourceHTTPClientImpl) ListDataSource(ctx context.Context, in *ListD
 	opts = append(opts, http.Operation(OperationDataSourceListDataSource))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListDataSourceMetadata 元数据管理相关接口
+func (c *DataSourceHTTPClientImpl) ListDataSourceMetadata(ctx context.Context, in *ListDataSourceMetadataRequest, opts ...http.CallOption) (*ListDataSourceMetadataReply, error) {
+	var out ListDataSourceMetadataReply
+	pattern := "/v1/datasource/{uid}/metadata"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceListDataSourceMetadata))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) ListDataSourceProxy(ctx context.Context, in *ListDataSourceProxyRequest, opts ...http.CallOption) (*ListDataSourceProxyReply, error) {
+	var out ListDataSourceProxyReply
+	pattern := "/v1/datasource/proxies"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceListDataSourceProxy))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) ListQueryFavorites(ctx context.Context, in *ListQueryFavoritesRequest, opts ...http.CallOption) (*ListQueryFavoritesReply, error) {
+	var out ListQueryFavoritesReply
+	pattern := "/v1/datasource/{uid}/query/favorites"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceListQueryFavorites))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) ListQueryHistory(ctx context.Context, in *ListQueryHistoryRequest, opts ...http.CallOption) (*ListQueryHistoryReply, error) {
+	var out ListQueryHistoryReply
+	pattern := "/v1/datasource/{uid}/query/history"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationDataSourceListQueryHistory))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// QueryDataSource 及时查询相关接口
+func (c *DataSourceHTTPClientImpl) QueryDataSource(ctx context.Context, in *QueryDataSourceRequest, opts ...http.CallOption) (*QueryDataSourceReply, error) {
+	var out QueryDataSourceReply
+	pattern := "/v1/datasource/{uid}/query"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationDataSourceQueryDataSource))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) RefreshDataSourceMetadata(ctx context.Context, in *RefreshDataSourceMetadataRequest, opts ...http.CallOption) (*RefreshDataSourceMetadataReply, error) {
+	var out RefreshDataSourceMetadataReply
+	pattern := "/v1/datasource/{uid}/metadata/refresh"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationDataSourceRefreshDataSourceMetadata))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) SaveQueryFavorite(ctx context.Context, in *SaveQueryFavoriteRequest, opts ...http.CallOption) (*SaveQueryFavoriteReply, error) {
+	var out SaveQueryFavoriteReply
+	pattern := "/v1/datasource/{uid}/query/favorite"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationDataSourceSaveQueryFavorite))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -314,10 +1091,36 @@ func (c *DataSourceHTTPClientImpl) SelectDataSource(ctx context.Context, in *Sel
 func (c *DataSourceHTTPClientImpl) TestConnection(ctx context.Context, in *TestConnectionRequest, opts ...http.CallOption) (*TestConnectionReply, error) {
 	var out TestConnectionReply
 	pattern := "/v1/datasource/{uid}/test"
-	path := binding.EncodeURL(pattern, in, true)
+	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationDataSourceTestConnection))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, nil, &out, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) UpdateAlertTemplate(ctx context.Context, in *UpdateAlertTemplateRequest, opts ...http.CallOption) (*UpdateAlertTemplateReply, error) {
+	var out UpdateAlertTemplateReply
+	pattern := "/v1/datasource/alert-template/{uid}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationDataSourceUpdateAlertTemplate))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) UpdateAlertTemplateStatus(ctx context.Context, in *UpdateAlertTemplateStatusRequest, opts ...http.CallOption) (*UpdateAlertTemplateStatusReply, error) {
+	var out UpdateAlertTemplateStatusReply
+	pattern := "/v1/datasource/alert-template/{uid}/status"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationDataSourceUpdateAlertTemplateStatus))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -329,6 +1132,19 @@ func (c *DataSourceHTTPClientImpl) UpdateDataSource(ctx context.Context, in *Upd
 	pattern := "/v1/datasource/{uid}"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationDataSourceUpdateDataSource))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *DataSourceHTTPClientImpl) UpdateDataSourceProxy(ctx context.Context, in *UpdateDataSourceProxyRequest, opts ...http.CallOption) (*UpdateDataSourceProxyReply, error) {
+	var out UpdateDataSourceProxyReply
+	pattern := "/v1/datasource/proxy/{uid}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationDataSourceUpdateDataSourceProxy))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {

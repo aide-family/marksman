@@ -22,7 +22,7 @@ message NamespaceModel {
     int64 uid = 2;
     string name = 3;
     map<string, string> metadata = 4;
-    sovereign.enum.GlobalStatus status = 5;
+    enums.GlobalStatus status = 5;
     int64 createdAt = 6;
     int64 updatedAt = 7;
     int64 deletedAt = 8;
@@ -39,7 +39,7 @@ message NamespaceItemSelect {
 message CreateNamespaceRequest {
     string name = 1;
     map<string, string> metadata = 2;
-    sovereign.enum.GlobalStatus status = 3;
+    enums.GlobalStatus status = 3;
 }
 
 message GetNamespaceRequest {
@@ -81,7 +81,7 @@ message ListNamespaceRequest {
     int32 page = 1;
     int32 pageSize = 2;
     string keyword = 3;
-    sovereign.enum.GlobalStatus status = 4;
+    enums.GlobalStatus status = 4;
     Field orderBy = 5;
     Order order = 6;
 }
@@ -96,7 +96,7 @@ message SelectNamespaceRequest {
     string keyword = 1;
     int32 limit = 2;
     int64 nextUID = 3;
-    sovereign.enum.GlobalStatus status = 4;
+    enums.GlobalStatus status = 4;
     Order order = 5;
 }
 message SelectNamespaceResponse {
@@ -108,7 +108,7 @@ message SelectNamespaceResponse {
 
 message UpdateNamespaceStatusRequest {
     int64 uid = 1;
-    sovereign.enum.GlobalStatus status = 2;
+    enums.GlobalStatus status = 2;
 }
 
 message GetNamespaceByNameRequest {

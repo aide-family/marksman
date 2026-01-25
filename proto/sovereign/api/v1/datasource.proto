@@ -52,6 +52,7 @@ service DataSource {
 	rpc TestConnection (TestConnectionRequest) returns (TestConnectionReply) {
 		option (google.api.http) = {
 			post: "/v1/datasource/{uid}/test"
+			body: "*"
 		};
 	}
 
@@ -168,6 +169,7 @@ service DataSource {
 	rpc RefreshDataSourceMetadata (RefreshDataSourceMetadataRequest) returns (RefreshDataSourceMetadataReply) {
 		option (google.api.http) = {
 			post: "/v1/datasource/{uid}/metadata/refresh"
+			body: "*"
 		};
 	}
 }
@@ -187,7 +189,7 @@ message CreateDataSourceReply {}
 message UpdateDataSourceRequest {
 	int64 uid = 1 [(buf.validate.field).required = true];
 	string name = 2 [(buf.validate.field).required = true, (buf.validate.field).string = { min_len: 1, max_len: 100 }];
-	sovereign.enum.GlobalStatus status = 3;
+	enums.GlobalStatus status = 3;
 	string endpoint = 4 [(buf.validate.field).string = { max_len: 255 }];
 	string description = 5 [(buf.validate.field).string = { max_len: 255 }];
 	map<string, string> config = 6;
@@ -197,8 +199,8 @@ message UpdateDataSourceReply {}
 
 message UpdateDataSourceStatusRequest {
 	int64 uid = 1 [(buf.validate.field).required = true];
-	sovereign.enum.GlobalStatus status = 2 [(buf.validate.field).required = true, (buf.validate.field).cel = {
-		expression: "this in [sovereign.enum.GlobalStatus.ENABLED, sovereign.enum.GlobalStatus.DISABLED]",
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true, (buf.validate.field).cel = {
+		expression: "this in [enums.GlobalStatus.ENABLED, enums.GlobalStatus.DISABLED]",
 		message: "status must be in ['ENABLED', 'DISABLED']",
 	}];
 }
@@ -226,7 +228,7 @@ message ListDataSourceRequest {
 		expression: "this.size() <= 200",
 		message: "keyword must be less than or equal to 200",
 	}];
-	sovereign.enum.GlobalStatus status = 4;
+	enums.GlobalStatus status = 4;
 	string type = 5;
 	string engine = 6;
 	int64 namespaceUid = 7;
@@ -244,7 +246,7 @@ message DataSourceItem {
 	string type = 3;
 	string engine = 4;
 	string name = 5;
-	sovereign.enum.GlobalStatus status = 6;
+	enums.GlobalStatus status = 6;
 	string endpoint = 7;
 	string description = 8;
 	map<string, string> config = 9;
@@ -270,7 +272,7 @@ message SelectDataSourceRequest {
 		message: "limit must be greater than or equal to 1 and less than or equal to 100",
 	}];
 	int64 nextUID = 3;
-	sovereign.enum.GlobalStatus status = 4;
+	enums.GlobalStatus status = 4;
 	string type = 5;
 	string engine = 6;
 	int64 namespaceUid = 7;
@@ -386,7 +388,7 @@ message AlertTemplateItem {
 	string name = 3;
 	string title_template = 4;
 	string content_template = 5;
-	enum.GlobalStatus status = 6;
+	enums.GlobalStatus status = 6;
 	int64 created_at = 7;
 	int64 updated_at = 8;
 }
@@ -396,7 +398,7 @@ message ListAlertTemplateRequest {
 	int32 page = 2;
 	int32 page_size = 3;
 	string keyword = 4;
-	enum.GlobalStatus status = 5;
+	enums.GlobalStatus status = 5;
 }
 
 message ListAlertTemplateReply {
@@ -406,7 +408,7 @@ message ListAlertTemplateReply {
 
 message UpdateAlertTemplateStatusRequest {
 	int64 uid = 1 [(buf.validate.field).required = true];
-	enum.GlobalStatus status = 2 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateAlertTemplateStatusReply {}

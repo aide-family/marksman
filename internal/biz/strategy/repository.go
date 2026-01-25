@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/bwmarrin/snowflake"
 	"github.com/aide-family/sovereign/internal/biz/shared"
+	"github.com/aide-family/sovereign/internal/biz/vobj"
 )
 
 type Repository interface {

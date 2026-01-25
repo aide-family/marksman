@@ -5,6 +5,7 @@ package sovereign.api.v1;
 import "google/api/annotations.proto";
 import "buf/validate/validate.proto";
 import "enum/enum.proto";
+import "api/v1/common.proto";
 
 option go_package = "github.com/aide-family/sovereign/pkg/api/v1;v1";
 option java_multiple_files = true;
@@ -95,7 +96,7 @@ message UpdateSubscriptionReply {}
 
 message UpdateSubscriptionStatusRequest {
 	int64 uid = 1 [(buf.validate.field).required = true];
-	enum.GlobalStatus status = 2 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true];
 }
 
 message UpdateSubscriptionStatusReply {}
@@ -117,7 +118,7 @@ message SubscriptionItem {
 	string type = 4;
 	string name = 5;
 	string description = 6;
-	enum.GlobalStatus status = 7;
+	enums.GlobalStatus status = 7;
 	repeated int64 strategy_group_uids = 8;
 	repeated int64 datasource_uids = 9;
 	repeated int32 alert_levels = 10;
@@ -133,7 +134,7 @@ message ListSubscriptionRequest {
 	int64 namespace_uid = 4;
 	string type = 5;
 	string keyword = 6;
-	enum.GlobalStatus status = 7;
+	enums.GlobalStatus status = 7;
 }
 
 message ListSubscriptionReply {
@@ -147,7 +148,7 @@ message SelectSubscriptionRequest {
 	string keyword = 3;
 	int32 limit = 4;
 	int64 next_uid = 5;
-	enum.GlobalStatus status = 6;
+	enums.GlobalStatus status = 6;
 }
 
 message SelectSubscriptionReply {
@@ -157,12 +158,7 @@ message SelectSubscriptionReply {
 	bool has_more = 4;
 }
 
-message SelectItem {
-	string value = 1;
-	string label = 2;
-	bool disabled = 3;
-	string tooltip = 4;
-}
+// SelectItem 定义在 common.proto 中
 
 message UpdateSubscriptionStrategyGroupsRequest {
 	int64 uid = 1 [(buf.validate.field).required = true];
