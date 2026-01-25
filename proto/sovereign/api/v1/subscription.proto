@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+package sovereign.api.v1;
+
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+import "enum/enum.proto";
+import "api/v1/common.proto";
+
+option go_package = "github.com/aide-family/sovereign/pkg/api/v1;v1";
+option java_multiple_files = true;
+option java_package = "sovereign.api.v1";
+
+service Subscription {
+	rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionReply) {
+		option (google.api.http) = {
+			post: "/v1/subscription"
+			body: "*"
+		};
+	}
+	rpc UpdateSubscription (UpdateSubscriptionRequest) returns (UpdateSubscriptionReply) {
+		option (google.api.http) = {
+			put: "/v1/subscription/{uid}"
+			body: "*"
+		};
+	}
+	rpc UpdateSubscriptionStatus (UpdateSubscriptionStatusRequest) returns (UpdateSubscriptionStatusReply) {
+		option (google.api.http) = {
+			put: "/v1/subscription/{uid}/status"
+			body: "*"
+		};
+	}
+	rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionReply) {
+		option (google.api.http) = {
+			delete: "/v1/subscription/{uid}"
+		};
+	}
+	rpc GetSubscription (GetSubscriptionRequest) returns (SubscriptionItem) {
+		option (google.api.http) = {
+			get: "/v1/subscription/{uid}"
+		};
+	}
+	rpc ListSubscription (ListSubscriptionRequest) returns (ListSubscriptionReply) {
+		option (google.api.http) = {
+			get: "/v1/subscriptions"
+		};
+	}
+	rpc SelectSubscription (SelectSubscriptionRequest) returns (SelectSubscriptionReply) {
+		option (google.api.http) = {
+			get: "/v1/subscriptions/select"
+		};
+	}
+	rpc UpdateSubscriptionStrategyGroups (UpdateSubscriptionStrategyGroupsRequest) returns (UpdateSubscriptionStrategyGroupsReply) {
+		option (google.api.http) = {
+			put: "/v1/subscription/{uid}/strategy-groups"
+			body: "*"
+		};
+	}
+	rpc UpdateSubscriptionDataSources (UpdateSubscriptionDataSourcesRequest) returns (UpdateSubscriptionDataSourcesReply) {
+		option (google.api.http) = {
+			put: "/v1/subscription/{uid}/data-sources"
+			body: "*"
+		};
+	}
+	rpc UpdateSubscriptionAlertLevels (UpdateSubscriptionAlertLevelsRequest) returns (UpdateSubscriptionAlertLevelsReply) {
+		option (google.api.http) = {
+			put: "/v1/subscription/{uid}/alert-levels"
+			body: "*"
+		};
+	}
+	rpc UpdateSubscriptionNotifyTypes (UpdateSubscriptionNotifyTypesRequest) returns (UpdateSubscriptionNotifyTypesReply) {
+		option (google.api.http) = {
+			put: "/v1/subscription/{uid}/notify-types"
+			body: "*"
+		};
+	}
+}
+
+message CreateSubscriptionRequest {
+	int64 user_id = 1 [(buf.validate.field).required = true];
+	int64 namespace_uid = 2 [(buf.validate.field).required = true];
+	string type = 3 [(buf.validate.field).required = true];
+	string name = 4 [(buf.validate.field).required = true];
+	string description = 5;
+}
+
+message CreateSubscriptionReply {}
+
+message UpdateSubscriptionRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string name = 2;
+	string description = 3;
+}
+
+message UpdateSubscriptionReply {}
+
+message UpdateSubscriptionStatusRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateSubscriptionStatusReply {}
+
+message DeleteSubscriptionRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteSubscriptionReply {}
+
+message GetSubscriptionRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message SubscriptionItem {
+	int64 uid = 1;
+	int64 user_id = 2;
+	int64 namespace_uid = 3;
+	string type = 4;
+	string name = 5;
+	string description = 6;
+	enums.GlobalStatus status = 7;
+	repeated int64 strategy_group_uids = 8;
+	repeated int64 datasource_uids = 9;
+	repeated int32 alert_levels = 10;
+	repeated string notify_types = 11;
+	int64 created_at = 12;
+	int64 updated_at = 13;
+}
+
+message ListSubscriptionRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	int64 user_id = 3;
+	int64 namespace_uid = 4;
+	string type = 5;
+	string keyword = 6;
+	enums.GlobalStatus status = 7;
+}
+
+message ListSubscriptionReply {
+	repeated SubscriptionItem subscriptions = 1;
+	int64 total = 2;
+}
+
+message SelectSubscriptionRequest {
+	int64 user_id = 1;
+	int64 namespace_uid = 2;
+	string keyword = 3;
+	int32 limit = 4;
+	int64 next_uid = 5;
+	enums.GlobalStatus status = 6;
+}
+
+message SelectSubscriptionReply {
+	repeated SelectItem items = 1;
+	int64 total = 2;
+	int64 next_uid = 3;
+	bool has_more = 4;
+}
+
+// SelectItem 定义在 common.proto 中
+
+message UpdateSubscriptionStrategyGroupsRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	repeated int64 strategy_group_uids = 2;
+}
+
+message UpdateSubscriptionStrategyGroupsReply {}
+
+message UpdateSubscriptionDataSourcesRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	repeated int64 datasource_uids = 2;
+}
+
+message UpdateSubscriptionDataSourcesReply {}
+
+message UpdateSubscriptionAlertLevelsRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	repeated int32 alert_levels = 2;
+}
+
+message UpdateSubscriptionAlertLevelsReply {}
+
+message UpdateSubscriptionNotifyTypesRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	repeated string notify_types = 2;
+}
+
+message UpdateSubscriptionNotifyTypesReply {}
+

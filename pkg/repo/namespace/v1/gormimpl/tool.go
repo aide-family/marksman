@@ -32,7 +32,7 @@ func ConvertNamespaceItemSelect(namespaceDo *model.Namespace) *namespacev1.Names
 	return &namespacev1.NamespaceItemSelect{
 		Value:    namespaceDo.UID.Int64(),
 		Label:    namespaceDo.Name,
-		Disabled: namespaceDo.DeletedAt.Valid || namespaceDo.Status != uint8(enum.GlobalStatus_ENABLED),
+		Disabled: namespaceDo.DeletedAt.Valid || namespaceDo.Status != int8(enum.GlobalStatus_ENABLED),
 		Tooltip:  string(metadata),
 	}
 }

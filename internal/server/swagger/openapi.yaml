@@ -18,6 +18,1004 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/sovereign.api.v1.HealthCheckReply'
+    /v1/alert/history/{uid}:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetAlertHistory
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.AlertHistoryItem'
+    /v1/alert/realtime/{uid}:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetRealtimeAlert
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.RealtimeAlertItem'
+    /v1/alert/{uid}/event-chart:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetAlertEventChart
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.GetAlertEventChartReply'
+    /v1/alert/{uid}/event-report:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetAlertEventReport
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.GetAlertEventReportReply'
+    /v1/alert/{uid}/intervene:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_InterveneAlert
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.InterveneAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.InterveneAlertReply'
+    /v1/alert/{uid}/raw-data:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetAlertRawData
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.GetAlertRawDataReply'
+    /v1/alert/{uid}/suppress:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_SuppressAlert
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.SuppressAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.SuppressAlertReply'
+    /v1/alert/{uid}/upgrade:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_UpgradeAlert
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpgradeAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpgradeAlertReply'
+    /v1/alerts/history:
+        get:
+            tags:
+                - EventCenter
+            description: 告警历史相关接口
+            operationId: EventCenter_ListAlertHistory
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: alertLevel
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: strategyUid
+                  in: query
+                  schema:
+                    type: string
+                - name: strategyGroupUid
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: onlyRecovered
+                  in: query
+                  schema:
+                    type: boolean
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListAlertHistoryReply'
+    /v1/alerts/realtime:
+        get:
+            tags:
+                - EventCenter
+            description: 实时告警相关接口
+            operationId: EventCenter_ListRealtimeAlerts
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: alertLevel
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: strategyUid
+                  in: query
+                  schema:
+                    type: string
+                - name: strategyGroupUid
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: onlyUnhandled
+                  in: query
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListRealtimeAlertsReply'
+    /v1/datasource:
+        post:
+            tags:
+                - DataSource
+            operationId: DataSource_CreateDataSource
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.CreateDataSourceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.CreateDataSourceReply'
+    /v1/datasource/alert-template/{uid}:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_GetAlertTemplate
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.AlertTemplateItem'
+        put:
+            tags:
+                - DataSource
+            operationId: DataSource_UpdateAlertTemplate
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateAlertTemplateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateAlertTemplateReply'
+        delete:
+            tags:
+                - DataSource
+            operationId: DataSource_DeleteAlertTemplate
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DeleteAlertTemplateReply'
+    /v1/datasource/alert-template/{uid}/apply:
+        post:
+            tags:
+                - DataSource
+            operationId: DataSource_ApplyAlertTemplate
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.ApplyAlertTemplateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ApplyAlertTemplateReply'
+    /v1/datasource/alert-template/{uid}/status:
+        put:
+            tags:
+                - DataSource
+            operationId: DataSource_UpdateAlertTemplateStatus
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateAlertTemplateStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateAlertTemplateStatusReply'
+    /v1/datasource/proxies:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_ListDataSourceProxy
+            parameters:
+                - name: namespaceUid
+                  in: query
+                  schema:
+                    type: string
+                - name: type
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListDataSourceProxyReply'
+    /v1/datasource/proxy:
+        post:
+            tags:
+                - DataSource
+            description: 数据源代理相关接口
+            operationId: DataSource_CreateDataSourceProxy
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.CreateDataSourceProxyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.CreateDataSourceProxyReply'
+    /v1/datasource/proxy/{uid}:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_GetDataSourceProxy
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DataSourceProxyItem'
+        put:
+            tags:
+                - DataSource
+            operationId: DataSource_UpdateDataSourceProxy
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateDataSourceProxyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateDataSourceProxyReply'
+        delete:
+            tags:
+                - DataSource
+            operationId: DataSource_DeleteDataSourceProxy
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DeleteDataSourceProxyReply'
+    /v1/datasource/{datasourceUid}/alert-template:
+        post:
+            tags:
+                - DataSource
+            description: 告警模板相关接口
+            operationId: DataSource_CreateAlertTemplate
+            parameters:
+                - name: datasourceUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.CreateAlertTemplateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.CreateAlertTemplateReply'
+    /v1/datasource/{datasourceUid}/alert-templates:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_ListAlertTemplate
+            parameters:
+                - name: datasourceUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListAlertTemplateReply'
+    /v1/datasource/{uid}:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_GetDataSource
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DataSourceItem'
+        put:
+            tags:
+                - DataSource
+            operationId: DataSource_UpdateDataSource
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateDataSourceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateDataSourceReply'
+        delete:
+            tags:
+                - DataSource
+            operationId: DataSource_DeleteDataSource
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DeleteDataSourceReply'
+    /v1/datasource/{uid}/metadata:
+        get:
+            tags:
+                - DataSource
+            description: 元数据管理相关接口
+            operationId: DataSource_ListDataSourceMetadata
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: metricType
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListDataSourceMetadataReply'
+    /v1/datasource/{uid}/metadata/refresh:
+        post:
+            tags:
+                - DataSource
+            operationId: DataSource_RefreshDataSourceMetadata
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.RefreshDataSourceMetadataRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.RefreshDataSourceMetadataReply'
+    /v1/datasource/{uid}/metadata/{metricName}:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_GetDataSourceMetadata
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: metricName
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DataSourceMetadataItem'
+    /v1/datasource/{uid}/query:
+        post:
+            tags:
+                - DataSource
+            description: 及时查询相关接口
+            operationId: DataSource_QueryDataSource
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.QueryDataSourceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.QueryDataSourceReply'
+    /v1/datasource/{uid}/query/favorite:
+        post:
+            tags:
+                - DataSource
+            operationId: DataSource_SaveQueryFavorite
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.SaveQueryFavoriteRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.SaveQueryFavoriteReply'
+    /v1/datasource/{uid}/query/favorite/{favoriteId}:
+        delete:
+            tags:
+                - DataSource
+            operationId: DataSource_DeleteQueryFavorite
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: favoriteId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DeleteQueryFavoriteReply'
+    /v1/datasource/{uid}/query/favorites:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_ListQueryFavorites
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListQueryFavoritesReply'
+    /v1/datasource/{uid}/query/history:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_ListQueryHistory
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListQueryHistoryReply'
+    /v1/datasource/{uid}/status:
+        put:
+            tags:
+                - DataSource
+            operationId: DataSource_UpdateDataSourceStatus
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateDataSourceStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateDataSourceStatusReply'
+    /v1/datasource/{uid}/test:
+        post:
+            tags:
+                - DataSource
+            operationId: DataSource_TestConnection
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.TestConnectionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.TestConnectionReply'
+    /v1/datasources:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_ListDataSource
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: type
+                  in: query
+                  schema:
+                    type: string
+                - name: engine
+                  in: query
+                  schema:
+                    type: string
+                - name: namespaceUid
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListDataSourceReply'
+    /v1/datasources/select:
+        get:
+            tags:
+                - DataSource
+            operationId: DataSource_SelectDataSource
+            parameters:
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: nextUID
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: type
+                  in: query
+                  schema:
+                    type: string
+                - name: engine
+                  in: query
+                  schema:
+                    type: string
+                - name: namespaceUid
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.SelectDataSourceReply'
+    /v1/event/external/alert:
+        post:
+            tags:
+                - EventCenter
+            description: 事件总线相关接口
+            operationId: EventCenter_PushExternalAlert
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.PushExternalAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.PushExternalAlertReply'
+    /v1/event/internal/alert:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_PushInternalAlert
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.PushInternalAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.PushInternalAlertReply'
     /v1/namespace:
         post:
             tags:
@@ -165,7 +1163,7 @@ paths:
                   schema:
                     type: integer
                     format: int32
-                - name: lastUID
+                - name: nextUID
                   in: query
                   schema:
                     type: string
@@ -181,8 +1179,1383 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/sovereign.api.v1.SelectNamespaceReply'
+    /v1/notification/{uid}/retry:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_RetryNotification
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.RetryNotificationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.RetryNotificationReply'
+    /v1/notifications/history:
+        get:
+            tags:
+                - EventCenter
+            description: 通知历史相关接口
+            operationId: EventCenter_ListNotificationHistory
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: alertUid
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+                - name: notifyType
+                  in: query
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListNotificationHistoryReply'
+    /v1/receiver:
+        post:
+            tags:
+                - Strategy
+            description: 接收对象相关接口
+            operationId: Strategy_CreateReceiver
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.CreateReceiverRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.CreateReceiverReply'
+    /v1/receiver/{uid}:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_GetReceiver
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ReceiverItem'
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateReceiver
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateReceiverRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateReceiverReply'
+        delete:
+            tags:
+                - Strategy
+            operationId: Strategy_DeleteReceiver
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DeleteReceiverReply'
+    /v1/receivers:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_ListReceiver
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: namespaceUid
+                  in: query
+                  schema:
+                    type: string
+                - name: type
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListReceiverReply'
+    /v1/scheduled-task/{uid}:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetScheduledTask
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ScheduledTaskItem'
+    /v1/scheduled-task/{uid}/status:
+        put:
+            tags:
+                - EventCenter
+            operationId: EventCenter_UpdateScheduledTaskStatus
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateScheduledTaskStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateScheduledTaskStatusReply'
+    /v1/scheduled-tasks:
+        get:
+            tags:
+                - EventCenter
+            description: 定时任务相关接口
+            operationId: EventCenter_ListScheduledTasks
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: strategyUid
+                  in: query
+                  schema:
+                    type: string
+                - name: executorType
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListScheduledTasksReply'
+    /v1/strategies:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_ListStrategy
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: namespaceUid
+                  in: query
+                  schema:
+                    type: string
+                - name: groupUid
+                  in: query
+                  schema:
+                    type: string
+                - name: type
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListStrategyReply'
+    /v1/strategies/select:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_SelectStrategy
+            parameters:
+                - name: namespaceUid
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: nextUid
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.SelectStrategyReply'
+    /v1/strategy:
+        post:
+            tags:
+                - Strategy
+            operationId: Strategy_CreateStrategy
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.CreateStrategyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.CreateStrategyReply'
+    /v1/strategy/group:
+        post:
+            tags:
+                - Strategy
+            description: 策略分组相关接口
+            operationId: Strategy_CreateStrategyGroup
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.CreateStrategyGroupRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.CreateStrategyGroupReply'
+    /v1/strategy/group/{groupUid}/strategies:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_GetGroupStrategies
+            parameters:
+                - name: groupUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListStrategyReply'
+    /v1/strategy/group/{groupUid}/strategy/{strategyUid}:
+        post:
+            tags:
+                - Strategy
+            operationId: Strategy_AddStrategyToGroup
+            parameters:
+                - name: groupUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: strategyUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.AddStrategyToGroupRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.AddStrategyToGroupReply'
+        delete:
+            tags:
+                - Strategy
+            operationId: Strategy_RemoveStrategyFromGroup
+            parameters:
+                - name: groupUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: strategyUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.RemoveStrategyFromGroupReply'
+    /v1/strategy/group/{uid}:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_GetStrategyGroup
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.StrategyGroupItem'
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategyGroup
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyGroupRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyGroupReply'
+        delete:
+            tags:
+                - Strategy
+            operationId: Strategy_DeleteStrategyGroup
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DeleteStrategyGroupReply'
+    /v1/strategy/group/{uid}/status:
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategyGroupStatus
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyGroupStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyGroupStatusReply'
+    /v1/strategy/group/{uid}/upgrade-config:
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategyGroupUpgradeConfig
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyGroupUpgradeConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyGroupUpgradeConfigReply'
+    /v1/strategy/group/{uid}/upgrade-mode:
+        put:
+            tags:
+                - Strategy
+            description: 策略组升级模式更新接口
+            operationId: Strategy_UpdateStrategyGroupUpgradeMode
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyGroupUpgradeModeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyGroupUpgradeModeReply'
+    /v1/strategy/groups:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_ListStrategyGroup
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: namespaceUid
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListStrategyGroupReply'
+    /v1/strategy/rule/{uid}:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_GetStrategyRule
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.StrategyRuleItem'
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategyRule
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyRuleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyRuleReply'
+        delete:
+            tags:
+                - Strategy
+            operationId: Strategy_DeleteStrategyRule
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DeleteStrategyRuleReply'
+    /v1/strategy/rule/{uid}/status:
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategyRuleStatus
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyRuleStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyRuleStatusReply'
+    /v1/strategy/{strategyUid}/rule:
+        post:
+            tags:
+                - Strategy
+            description: 策略规则相关接口
+            operationId: Strategy_CreateStrategyRule
+            parameters:
+                - name: strategyUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.CreateStrategyRuleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.CreateStrategyRuleReply'
+    /v1/strategy/{strategyUid}/rules:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_ListStrategyRule
+            parameters:
+                - name: strategyUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListStrategyRuleReply'
+    /v1/strategy/{uid}:
+        get:
+            tags:
+                - Strategy
+            operationId: Strategy_GetStrategy
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.StrategyItem'
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategy
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyReply'
+        delete:
+            tags:
+                - Strategy
+            operationId: Strategy_DeleteStrategy
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DeleteStrategyReply'
+    /v1/strategy/{uid}/alert-config:
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategyAlertConfig
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyAlertConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyAlertConfigReply'
+    /v1/strategy/{uid}/datasource-config:
+        put:
+            tags:
+                - Strategy
+            description: 策略详细配置更新接口
+            operationId: Strategy_UpdateStrategyDataSourceConfig
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyDataSourceConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyDataSourceConfigReply'
+    /v1/strategy/{uid}/dial-test-config:
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategyDialTestConfig
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyDialTestConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyDialTestConfigReply'
+    /v1/strategy/{uid}/notify-config:
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategyNotifyConfig
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyNotifyConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyNotifyConfigReply'
+    /v1/strategy/{uid}/status:
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategyStatus
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategyStatusReply'
+    /v1/strategy/{uid}/suppress-config:
+        put:
+            tags:
+                - Strategy
+            operationId: Strategy_UpdateStrategySuppressConfig
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategySuppressConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateStrategySuppressConfigReply'
+    /v1/subscription:
+        post:
+            tags:
+                - Subscription
+            operationId: Subscription_CreateSubscription
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.CreateSubscriptionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.CreateSubscriptionReply'
+    /v1/subscription/{uid}:
+        get:
+            tags:
+                - Subscription
+            operationId: Subscription_GetSubscription
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.SubscriptionItem'
+        put:
+            tags:
+                - Subscription
+            operationId: Subscription_UpdateSubscription
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionReply'
+        delete:
+            tags:
+                - Subscription
+            operationId: Subscription_DeleteSubscription
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.DeleteSubscriptionReply'
+    /v1/subscription/{uid}/alert-levels:
+        put:
+            tags:
+                - Subscription
+            operationId: Subscription_UpdateSubscriptionAlertLevels
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionAlertLevelsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionAlertLevelsReply'
+    /v1/subscription/{uid}/data-sources:
+        put:
+            tags:
+                - Subscription
+            operationId: Subscription_UpdateSubscriptionDataSources
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionDataSourcesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionDataSourcesReply'
+    /v1/subscription/{uid}/notify-types:
+        put:
+            tags:
+                - Subscription
+            operationId: Subscription_UpdateSubscriptionNotifyTypes
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionNotifyTypesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionNotifyTypesReply'
+    /v1/subscription/{uid}/status:
+        put:
+            tags:
+                - Subscription
+            operationId: Subscription_UpdateSubscriptionStatus
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionStatusReply'
+    /v1/subscription/{uid}/strategy-groups:
+        put:
+            tags:
+                - Subscription
+            operationId: Subscription_UpdateSubscriptionStrategyGroups
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionStrategyGroupsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateSubscriptionStrategyGroupsReply'
+    /v1/subscriptions:
+        get:
+            tags:
+                - Subscription
+            operationId: Subscription_ListSubscription
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: userId
+                  in: query
+                  schema:
+                    type: string
+                - name: namespaceUid
+                  in: query
+                  schema:
+                    type: string
+                - name: type
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListSubscriptionReply'
+    /v1/subscriptions/select:
+        get:
+            tags:
+                - Subscription
+            operationId: Subscription_SelectSubscription
+            parameters:
+                - name: userId
+                  in: query
+                  schema:
+                    type: string
+                - name: namespaceUid
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: nextUid
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.SelectSubscriptionReply'
 components:
     schemas:
+        sovereign.api.v1.AddStrategyToGroupReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.AddStrategyToGroupRequest:
+            type: object
+            properties:
+                groupUid:
+                    type: string
+                strategyUid:
+                    type: string
+        sovereign.api.v1.AlertHistoryItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                alertLevel:
+                    type: integer
+                    format: int32
+                alertTime:
+                    type: string
+                duration:
+                    type: string
+                isRecovered:
+                    type: boolean
+                recoveredAt:
+                    type: string
+                alertTitle:
+                    type: string
+                alertContent:
+                    type: string
+                processingDuration:
+                    type: string
+                strategyUid:
+                    type: string
+                strategyGroupUid:
+                    type: string
+                labels:
+                    type: object
+                    additionalProperties:
+                        type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.AlertTemplateItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                datasourceUid:
+                    type: string
+                name:
+                    type: string
+                titleTemplate:
+                    type: string
+                contentTemplate:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.ApplyAlertTemplateReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.ApplyAlertTemplateRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                strategyUid:
+                    type: string
+        sovereign.api.v1.CreateAlertTemplateReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.CreateAlertTemplateRequest:
+            type: object
+            properties:
+                datasourceUid:
+                    type: string
+                name:
+                    type: string
+                titleTemplate:
+                    type: string
+                contentTemplate:
+                    type: string
+            description: 告警模板相关消息
+        sovereign.api.v1.CreateDataSourceProxyReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.CreateDataSourceProxyRequest:
+            type: object
+            properties:
+                namespaceUid:
+                    type: string
+                type:
+                    type: string
+                name:
+                    type: string
+                datasourceUid:
+                    type: string
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
+            description: 数据源代理相关消息
+        sovereign.api.v1.CreateDataSourceReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.CreateDataSourceRequest:
+            type: object
+            properties:
+                namespaceUid:
+                    type: string
+                type:
+                    type: string
+                engine:
+                    type: string
+                name:
+                    type: string
+                endpoint:
+                    type: string
+                description:
+                    type: string
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
+                metadata:
+                    type: object
+                    additionalProperties:
+                        type: string
         sovereign.api.v1.CreateNamespaceReply:
             type: object
             properties: {}
@@ -195,9 +2568,226 @@ components:
                     type: object
                     additionalProperties:
                         type: string
+        sovereign.api.v1.CreateReceiverReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.CreateReceiverRequest:
+            type: object
+            properties:
+                namespaceUid:
+                    type: string
+                type:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                userIds:
+                    type: array
+                    items:
+                        type: string
+                labelMatch:
+                    type: object
+                    additionalProperties:
+                        type: string
+                notifyTypes:
+                    type: array
+                    items:
+                        type: string
+            description: 接收对象相关消息
+        sovereign.api.v1.CreateStrategyGroupReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.CreateStrategyGroupRequest:
+            type: object
+            properties:
+                namespaceUid:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+            description: 策略分组相关消息
+        sovereign.api.v1.CreateStrategyReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.CreateStrategyRequest:
+            type: object
+            properties:
+                namespaceUid:
+                    type: string
+                type:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+        sovereign.api.v1.CreateStrategyRuleReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.CreateStrategyRuleRequest:
+            type: object
+            properties:
+                strategyUid:
+                    type: string
+                ruleDetail:
+                    type: string
+                alertLevel:
+                    type: integer
+                    format: int32
+                alertPages:
+                    type: array
+                    items:
+                        type: string
+                order:
+                    type: integer
+                    format: int32
+            description: 策略规则相关消息
+        sovereign.api.v1.CreateSubscriptionReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.CreateSubscriptionRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                namespaceUid:
+                    type: string
+                type:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+        sovereign.api.v1.DataSourceItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                namespaceUid:
+                    type: string
+                type:
+                    type: string
+                engine:
+                    type: string
+                name:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                endpoint:
+                    type: string
+                description:
+                    type: string
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
+                metadata:
+                    type: object
+                    additionalProperties:
+                        type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.DataSourceItemSelect:
+            type: object
+            properties:
+                value:
+                    type: string
+                label:
+                    type: string
+                disabled:
+                    type: boolean
+                tooltip:
+                    type: string
+        sovereign.api.v1.DataSourceMetadataItem:
+            type: object
+            properties:
+                metricName:
+                    type: string
+                metricType:
+                    type: string
+                description:
+                    type: string
+                labelCount:
+                    type: integer
+                    format: int32
+                labels:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/sovereign.api.v1.MetadataLabelValues'
+        sovereign.api.v1.DataSourceProxyItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                namespaceUid:
+                    type: string
+                datasourceUid:
+                    type: string
+                type:
+                    type: string
+                name:
+                    type: string
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.DeleteAlertTemplateReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.DeleteDataSourceProxyReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.DeleteDataSourceReply:
+            type: object
+            properties: {}
         sovereign.api.v1.DeleteNamespaceReply:
             type: object
             properties: {}
+        sovereign.api.v1.DeleteQueryFavoriteReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.DeleteReceiverReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.DeleteStrategyGroupReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.DeleteStrategyReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.DeleteStrategyRuleReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.DeleteSubscriptionReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.GetAlertEventChartReply:
+            type: object
+            properties:
+                chartData:
+                    type: string
+        sovereign.api.v1.GetAlertEventReportReply:
+            type: object
+            properties:
+                originalReport:
+                    type: string
+                aiAnalysisReport:
+                    type: string
+        sovereign.api.v1.GetAlertRawDataReply:
+            type: object
+            properties:
+                rawData:
+                    type: string
+                recoveredRawData:
+                    type: string
         sovereign.api.v1.HealthCheckReply:
             type: object
             properties:
@@ -208,6 +2798,67 @@ components:
                 timestamp:
                     type: string
                     format: date-time
+        sovereign.api.v1.InterveneAlertReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.InterveneAlertRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                log:
+                    type: string
+        sovereign.api.v1.ListAlertHistoryReply:
+            type: object
+            properties:
+                alerts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.AlertHistoryItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListAlertTemplateReply:
+            type: object
+            properties:
+                templates:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.AlertTemplateItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListDataSourceMetadataReply:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.DataSourceMetadataItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListDataSourceProxyReply:
+            type: object
+            properties:
+                proxies:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.DataSourceProxyItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListDataSourceReply:
+            type: object
+            properties:
+                total:
+                    type: string
+                page:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.DataSourceItem'
         sovereign.api.v1.ListNamespaceReply:
             type: object
             properties:
@@ -223,6 +2874,99 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/sovereign.api.v1.NamespaceItem'
+        sovereign.api.v1.ListNotificationHistoryReply:
+            type: object
+            properties:
+                notifications:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.NotificationHistoryItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListQueryFavoritesReply:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.QueryFavoriteItem'
+        sovereign.api.v1.ListQueryHistoryReply:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.QueryHistoryItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListRealtimeAlertsReply:
+            type: object
+            properties:
+                alerts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.RealtimeAlertItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListReceiverReply:
+            type: object
+            properties:
+                receivers:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.ReceiverItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListScheduledTasksReply:
+            type: object
+            properties:
+                tasks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.ScheduledTaskItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListStrategyGroupReply:
+            type: object
+            properties:
+                groups:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.StrategyGroupItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListStrategyReply:
+            type: object
+            properties:
+                strategies:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.StrategyItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListStrategyRuleReply:
+            type: object
+            properties:
+                rules:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.StrategyRuleItem'
+        sovereign.api.v1.ListSubscriptionReply:
+            type: object
+            properties:
+                subscriptions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.SubscriptionItem'
+                total:
+                    type: string
+        sovereign.api.v1.MetadataLabelValues:
+            type: object
+            properties:
+                values:
+                    type: array
+                    items:
+                        type: string
         sovereign.api.v1.NamespaceItem:
             type: object
             properties:
@@ -252,6 +2996,239 @@ components:
                     type: boolean
                 tooltip:
                     type: string
+        sovereign.api.v1.NotificationHistoryItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                notificationTime:
+                    type: string
+                status:
+                    type: string
+                notifyType:
+                    type: string
+                receiver:
+                    type: string
+                receiverType:
+                    type: string
+                content:
+                    type: string
+                alertUid:
+                    type: string
+                retryCount:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.PushExternalAlertReply:
+            type: object
+            properties:
+                alertUid:
+                    type: string
+        sovereign.api.v1.PushExternalAlertRequest:
+            type: object
+            properties:
+                source:
+                    type: string
+                alertData:
+                    type: object
+                    additionalProperties:
+                        type: string
+            description: 事件总线相关消息
+        sovereign.api.v1.PushInternalAlertReply:
+            type: object
+            properties:
+                alertUid:
+                    type: string
+        sovereign.api.v1.PushInternalAlertRequest:
+            type: object
+            properties:
+                eventType:
+                    type: string
+                eventData:
+                    type: object
+                    additionalProperties:
+                        type: string
+        sovereign.api.v1.QueryDataSourceReply:
+            type: object
+            properties:
+                result:
+                    type: string
+        sovereign.api.v1.QueryDataSourceRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                query:
+                    type: string
+                format:
+                    type: string
+            description: 及时查询相关消息
+        sovereign.api.v1.QueryFavoriteItem:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                query:
+                    type: string
+                createdAt:
+                    type: string
+        sovereign.api.v1.QueryHistoryItem:
+            type: object
+            properties:
+                id:
+                    type: string
+                query:
+                    type: string
+                createdAt:
+                    type: string
+        sovereign.api.v1.RealtimeAlertItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                alertLevel:
+                    type: integer
+                    format: int32
+                alertTime:
+                    type: string
+                duration:
+                    type: string
+                alertTitle:
+                    type: string
+                alertContent:
+                    type: string
+                intervener:
+                    type: string
+                strategyUid:
+                    type: string
+                strategyGroupUid:
+                    type: string
+                isSuppressed:
+                    type: boolean
+                isUpgraded:
+                    type: boolean
+                labels:
+                    type: object
+                    additionalProperties:
+                        type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.ReceiverItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                namespaceUid:
+                    type: string
+                type:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                userIds:
+                    type: array
+                    items:
+                        type: string
+                labelMatch:
+                    type: object
+                    additionalProperties:
+                        type: string
+                notifyTypes:
+                    type: array
+                    items:
+                        type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.RefreshDataSourceMetadataReply:
+            type: object
+            properties:
+                metricCount:
+                    type: integer
+                    format: int32
+        sovereign.api.v1.RefreshDataSourceMetadataRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+        sovereign.api.v1.RemoveStrategyFromGroupReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.RetryNotificationReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.RetryNotificationRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+        sovereign.api.v1.SaveQueryFavoriteReply:
+            type: object
+            properties:
+                favoriteId:
+                    type: string
+        sovereign.api.v1.SaveQueryFavoriteRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                query:
+                    type: string
+                name:
+                    type: string
+        sovereign.api.v1.ScheduledTaskItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                strategyUid:
+                    type: string
+                executorType:
+                    type: string
+                status:
+                    type: string
+                lastExecuteTime:
+                    type: string
+                nextExecuteTime:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.SelectDataSourceReply:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.DataSourceItemSelect'
+                total:
+                    type: string
+                nextUID:
+                    type: string
+                hasMore:
+                    type: boolean
+        sovereign.api.v1.SelectItem:
+            type: object
+            properties:
+                value:
+                    type: string
+                label:
+                    type: string
+                disabled:
+                    type: boolean
+                tooltip:
+                    type: string
+            description: SelectItem 通用选择项消息
         sovereign.api.v1.SelectNamespaceReply:
             type: object
             properties:
@@ -261,10 +3238,245 @@ components:
                         $ref: '#/components/schemas/sovereign.api.v1.NamespaceItemSelect'
                 total:
                     type: string
-                lastUID:
+                nextUID:
                     type: string
                 hasMore:
                     type: boolean
+        sovereign.api.v1.SelectStrategyReply:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.SelectItem'
+                total:
+                    type: string
+                nextUid:
+                    type: string
+                hasMore:
+                    type: boolean
+        sovereign.api.v1.SelectSubscriptionReply:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.SelectItem'
+                total:
+                    type: string
+                nextUid:
+                    type: string
+                hasMore:
+                    type: boolean
+        sovereign.api.v1.StrategyGroupItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                namespaceUid:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                upgradeMode:
+                    type: integer
+                    format: int32
+                upgradeConfig:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.StrategyItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                namespaceUid:
+                    type: string
+                groupUid:
+                    type: string
+                type:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.StrategyRuleItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                strategyUid:
+                    type: string
+                ruleDetail:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                alertLevel:
+                    type: integer
+                    format: int32
+                alertPages:
+                    type: array
+                    items:
+                        type: string
+                order:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.SubscriptionItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                userId:
+                    type: string
+                namespaceUid:
+                    type: string
+                type:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                strategyGroupUids:
+                    type: array
+                    items:
+                        type: string
+                datasourceUids:
+                    type: array
+                    items:
+                        type: string
+                alertLevels:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                notifyTypes:
+                    type: array
+                    items:
+                        type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.SuppressAlertReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.SuppressAlertRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                suppressDuration:
+                    type: string
+                reason:
+                    type: string
+        sovereign.api.v1.TestConnectionReply:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                message:
+                    type: string
+        sovereign.api.v1.TestConnectionRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+        sovereign.api.v1.UpdateAlertTemplateReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateAlertTemplateRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                titleTemplate:
+                    type: string
+                contentTemplate:
+                    type: string
+        sovereign.api.v1.UpdateAlertTemplateStatusReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateAlertTemplateStatusRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+        sovereign.api.v1.UpdateDataSourceProxyReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateDataSourceProxyRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
+        sovereign.api.v1.UpdateDataSourceReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateDataSourceRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                endpoint:
+                    type: string
+                description:
+                    type: string
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
+                metadata:
+                    type: object
+                    additionalProperties:
+                        type: string
+        sovereign.api.v1.UpdateDataSourceStatusReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateDataSourceStatusRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
         sovereign.api.v1.UpdateNamespaceReply:
             type: object
             properties: {}
@@ -290,6 +3502,304 @@ components:
                 status:
                     type: integer
                     format: enum
+        sovereign.api.v1.UpdateReceiverReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateReceiverRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                userIds:
+                    type: array
+                    items:
+                        type: string
+                labelMatch:
+                    type: object
+                    additionalProperties:
+                        type: string
+                notifyTypes:
+                    type: array
+                    items:
+                        type: string
+        sovereign.api.v1.UpdateScheduledTaskStatusReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateScheduledTaskStatusRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                status:
+                    type: string
+        sovereign.api.v1.UpdateStrategyAlertConfigReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyAlertConfigRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                alertTitle:
+                    type: string
+                alertContent:
+                    type: string
+                alertLevel:
+                    type: integer
+                    format: int32
+                alertPages:
+                    type: array
+                    items:
+                        type: string
+        sovereign.api.v1.UpdateStrategyDataSourceConfigReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyDataSourceConfigRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                datasourceUids:
+                    type: array
+                    items:
+                        type: string
+                query:
+                    type: string
+                datasourceType:
+                    type: string
+            description: 策略详细配置更新消息
+        sovereign.api.v1.UpdateStrategyDialTestConfigReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyDialTestConfigRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                dialTestType:
+                    type: string
+                dialTestTargets:
+                    type: object
+                    additionalProperties:
+                        type: string
+        sovereign.api.v1.UpdateStrategyGroupReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyGroupRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+        sovereign.api.v1.UpdateStrategyGroupStatusReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyGroupStatusRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+        sovereign.api.v1.UpdateStrategyGroupUpgradeConfigReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyGroupUpgradeConfigRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                upgradeConfig:
+                    type: string
+        sovereign.api.v1.UpdateStrategyGroupUpgradeModeReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyGroupUpgradeModeRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                upgradeMode:
+                    type: integer
+                    format: int32
+            description: 策略组升级模式更新消息
+        sovereign.api.v1.UpdateStrategyNotifyConfigReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyNotifyConfigRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                receiverUids:
+                    type: array
+                    items:
+                        type: string
+        sovereign.api.v1.UpdateStrategyReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+        sovereign.api.v1.UpdateStrategyRuleReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyRuleRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                ruleDetail:
+                    type: string
+                alertLevel:
+                    type: integer
+                    format: int32
+                alertPages:
+                    type: array
+                    items:
+                        type: string
+                order:
+                    type: integer
+                    format: int32
+        sovereign.api.v1.UpdateStrategyRuleStatusReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyRuleStatusRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+        sovereign.api.v1.UpdateStrategyStatusReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategyStatusRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+        sovereign.api.v1.UpdateStrategySuppressConfigReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateStrategySuppressConfigRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                suppressType:
+                    type: string
+                suppressConfig:
+                    type: string
+        sovereign.api.v1.UpdateSubscriptionAlertLevelsReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateSubscriptionAlertLevelsRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                alertLevels:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+        sovereign.api.v1.UpdateSubscriptionDataSourcesReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateSubscriptionDataSourcesRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                datasourceUids:
+                    type: array
+                    items:
+                        type: string
+        sovereign.api.v1.UpdateSubscriptionNotifyTypesReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateSubscriptionNotifyTypesRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                notifyTypes:
+                    type: array
+                    items:
+                        type: string
+        sovereign.api.v1.UpdateSubscriptionReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateSubscriptionRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+        sovereign.api.v1.UpdateSubscriptionStatusReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateSubscriptionStatusRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+        sovereign.api.v1.UpdateSubscriptionStrategyGroupsReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateSubscriptionStrategyGroupsRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                strategyGroupUids:
+                    type: array
+                    items:
+                        type: string
+        sovereign.api.v1.UpgradeAlertReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpgradeAlertRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                receiverUids:
+                    type: array
+                    items:
+                        type: string
+                log:
+                    type: string
 tags:
+    - name: DataSource
+    - name: EventCenter
+      description: 事件中心服务
     - name: Health
     - name: Namespace
+    - name: Strategy
+    - name: Subscription

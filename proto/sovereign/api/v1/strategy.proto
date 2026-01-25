@@ -1,0 +1,551 @@
+syntax = "proto3";
+
+package sovereign.api.v1;
+
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+import "enum/enum.proto";
+import "api/v1/common.proto";
+
+option go_package = "github.com/aide-family/sovereign/pkg/api/v1;v1";
+option java_multiple_files = true;
+option java_package = "sovereign.api.v1";
+
+service Strategy {
+	rpc CreateStrategy (CreateStrategyRequest) returns (CreateStrategyReply) {
+		option (google.api.http) = {
+			post: "/v1/strategy"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategy (UpdateStrategyRequest) returns (UpdateStrategyReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyStatus (UpdateStrategyStatusRequest) returns (UpdateStrategyStatusReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/status"
+			body: "*"
+		};
+	}
+	rpc DeleteStrategy (DeleteStrategyRequest) returns (DeleteStrategyReply) {
+		option (google.api.http) = {
+			delete: "/v1/strategy/{uid}"
+		};
+	}
+	rpc GetStrategy (GetStrategyRequest) returns (StrategyItem) {
+		option (google.api.http) = {
+			get: "/v1/strategy/{uid}"
+		};
+	}
+	rpc ListStrategy (ListStrategyRequest) returns (ListStrategyReply) {
+		option (google.api.http) = {
+			get: "/v1/strategies"
+		};
+	}
+	rpc SelectStrategy (SelectStrategyRequest) returns (SelectStrategyReply) {
+		option (google.api.http) = {
+			get: "/v1/strategies/select"
+		};
+	}
+
+	// 策略分组相关接口
+	rpc CreateStrategyGroup (CreateStrategyGroupRequest) returns (CreateStrategyGroupReply) {
+		option (google.api.http) = {
+			post: "/v1/strategy/group"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyGroup (UpdateStrategyGroupRequest) returns (UpdateStrategyGroupReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/group/{uid}"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyGroupStatus (UpdateStrategyGroupStatusRequest) returns (UpdateStrategyGroupStatusReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/group/{uid}/status"
+			body: "*"
+		};
+	}
+	rpc DeleteStrategyGroup (DeleteStrategyGroupRequest) returns (DeleteStrategyGroupReply) {
+		option (google.api.http) = {
+			delete: "/v1/strategy/group/{uid}"
+		};
+	}
+	rpc GetStrategyGroup (GetStrategyGroupRequest) returns (StrategyGroupItem) {
+		option (google.api.http) = {
+			get: "/v1/strategy/group/{uid}"
+		};
+	}
+	rpc ListStrategyGroup (ListStrategyGroupRequest) returns (ListStrategyGroupReply) {
+		option (google.api.http) = {
+			get: "/v1/strategy/groups"
+		};
+	}
+	rpc GetGroupStrategies (GetGroupStrategiesRequest) returns (ListStrategyReply) {
+		option (google.api.http) = {
+			get: "/v1/strategy/group/{group_uid}/strategies"
+		};
+	}
+	rpc AddStrategyToGroup (AddStrategyToGroupRequest) returns (AddStrategyToGroupReply) {
+		option (google.api.http) = {
+			post: "/v1/strategy/group/{group_uid}/strategy/{strategy_uid}"
+			body: "*"
+		};
+	}
+	rpc RemoveStrategyFromGroup (RemoveStrategyFromGroupRequest) returns (RemoveStrategyFromGroupReply) {
+		option (google.api.http) = {
+			delete: "/v1/strategy/group/{group_uid}/strategy/{strategy_uid}"
+		};
+	}
+
+	// 策略组升级模式更新接口
+	rpc UpdateStrategyGroupUpgradeMode (UpdateStrategyGroupUpgradeModeRequest) returns (UpdateStrategyGroupUpgradeModeReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/group/{uid}/upgrade-mode"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyGroupUpgradeConfig (UpdateStrategyGroupUpgradeConfigRequest) returns (UpdateStrategyGroupUpgradeConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/group/{uid}/upgrade-config"
+			body: "*"
+		};
+	}
+
+	// 接收对象相关接口
+	rpc CreateReceiver (CreateReceiverRequest) returns (CreateReceiverReply) {
+		option (google.api.http) = {
+			post: "/v1/receiver"
+			body: "*"
+		};
+	}
+	rpc UpdateReceiver (UpdateReceiverRequest) returns (UpdateReceiverReply) {
+		option (google.api.http) = {
+			put: "/v1/receiver/{uid}"
+			body: "*"
+		};
+	}
+	rpc DeleteReceiver (DeleteReceiverRequest) returns (DeleteReceiverReply) {
+		option (google.api.http) = {
+			delete: "/v1/receiver/{uid}"
+		};
+	}
+	rpc GetReceiver (GetReceiverRequest) returns (ReceiverItem) {
+		option (google.api.http) = {
+			get: "/v1/receiver/{uid}"
+		};
+	}
+	rpc ListReceiver (ListReceiverRequest) returns (ListReceiverReply) {
+		option (google.api.http) = {
+			get: "/v1/receivers"
+		};
+	}
+
+	// 策略规则相关接口
+	rpc CreateStrategyRule (CreateStrategyRuleRequest) returns (CreateStrategyRuleReply) {
+		option (google.api.http) = {
+			post: "/v1/strategy/{strategy_uid}/rule"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyRule (UpdateStrategyRuleRequest) returns (UpdateStrategyRuleReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/rule/{uid}"
+			body: "*"
+		};
+	}
+	rpc DeleteStrategyRule (DeleteStrategyRuleRequest) returns (DeleteStrategyRuleReply) {
+		option (google.api.http) = {
+			delete: "/v1/strategy/rule/{uid}"
+		};
+	}
+	rpc GetStrategyRule (GetStrategyRuleRequest) returns (StrategyRuleItem) {
+		option (google.api.http) = {
+			get: "/v1/strategy/rule/{uid}"
+		};
+	}
+	rpc ListStrategyRule (ListStrategyRuleRequest) returns (ListStrategyRuleReply) {
+		option (google.api.http) = {
+			get: "/v1/strategy/{strategy_uid}/rules"
+		};
+	}
+	rpc UpdateStrategyRuleStatus (UpdateStrategyRuleStatusRequest) returns (UpdateStrategyRuleStatusReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/rule/{uid}/status"
+			body: "*"
+		};
+	}
+
+	// 策略详细配置更新接口
+	rpc UpdateStrategyDataSourceConfig (UpdateStrategyDataSourceConfigRequest) returns (UpdateStrategyDataSourceConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/datasource-config"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyAlertConfig (UpdateStrategyAlertConfigRequest) returns (UpdateStrategyAlertConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/alert-config"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyNotifyConfig (UpdateStrategyNotifyConfigRequest) returns (UpdateStrategyNotifyConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/notify-config"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategyDialTestConfig (UpdateStrategyDialTestConfigRequest) returns (UpdateStrategyDialTestConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/dial-test-config"
+			body: "*"
+		};
+	}
+	rpc UpdateStrategySuppressConfig (UpdateStrategySuppressConfigRequest) returns (UpdateStrategySuppressConfigReply) {
+		option (google.api.http) = {
+			put: "/v1/strategy/{uid}/suppress-config"
+			body: "*"
+		};
+	}
+}
+
+message CreateStrategyRequest {
+	int64 namespace_uid = 1 [(buf.validate.field).required = true];
+	string type = 2 [(buf.validate.field).required = true];
+	string name = 3 [(buf.validate.field).required = true];
+	string description = 4;
+}
+
+message CreateStrategyReply {}
+
+message UpdateStrategyRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string name = 2;
+	string description = 3;
+}
+
+message UpdateStrategyReply {}
+
+message UpdateStrategyStatusRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateStrategyStatusReply {}
+
+message DeleteStrategyRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteStrategyReply {}
+
+message GetStrategyRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message StrategyItem {
+	int64 uid = 1;
+	int64 namespace_uid = 2;
+	int64 group_uid = 3;
+	string type = 4;
+	string name = 5;
+	string description = 6;
+	enums.GlobalStatus status = 7;
+	int64 created_at = 8;
+	int64 updated_at = 9;
+}
+
+message ListStrategyRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	int64 namespace_uid = 3;
+	int64 group_uid = 4;
+	string type = 5;
+	string keyword = 6;
+	enums.GlobalStatus status = 7;
+}
+
+message ListStrategyReply {
+	repeated StrategyItem strategies = 1;
+	int64 total = 2;
+}
+
+message SelectStrategyRequest {
+	int64 namespace_uid = 1;
+	string keyword = 2;
+	int32 limit = 3;
+	int64 next_uid = 4;
+	enums.GlobalStatus status = 5;
+}
+
+message SelectStrategyReply {
+	repeated SelectItem items = 1;
+	int64 total = 2;
+	int64 next_uid = 3;
+	bool has_more = 4;
+}
+
+// SelectItem 定义在 common.proto 中
+
+// 策略分组相关消息
+message CreateStrategyGroupRequest {
+	int64 namespace_uid = 1 [(buf.validate.field).required = true];
+	string name = 2 [(buf.validate.field).required = true];
+	string description = 3;
+}
+
+message CreateStrategyGroupReply {}
+
+message UpdateStrategyGroupRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string name = 2;
+	string description = 3;
+}
+
+message UpdateStrategyGroupReply {}
+
+message UpdateStrategyGroupStatusRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateStrategyGroupStatusReply {}
+
+message DeleteStrategyGroupRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteStrategyGroupReply {}
+
+message GetStrategyGroupRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message StrategyGroupItem {
+	int64 uid = 1;
+	int64 namespace_uid = 2;
+	string name = 3;
+	string description = 4;
+	enums.GlobalStatus status = 5;
+	int32 upgrade_mode = 6;
+	string upgrade_config = 7;
+	int64 created_at = 8;
+	int64 updated_at = 9;
+}
+
+message ListStrategyGroupRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	int64 namespace_uid = 3;
+	string keyword = 4;
+	enums.GlobalStatus status = 5;
+}
+
+message ListStrategyGroupReply {
+	repeated StrategyGroupItem groups = 1;
+	int64 total = 2;
+}
+
+message GetGroupStrategiesRequest {
+	int64 group_uid = 1 [(buf.validate.field).required = true];
+	int32 page = 2;
+	int32 page_size = 3;
+	string keyword = 4;
+	enums.GlobalStatus status = 5;
+}
+
+message AddStrategyToGroupRequest {
+	int64 group_uid = 1 [(buf.validate.field).required = true];
+	int64 strategy_uid = 2 [(buf.validate.field).required = true];
+}
+
+message AddStrategyToGroupReply {}
+
+message RemoveStrategyFromGroupRequest {
+	int64 group_uid = 1 [(buf.validate.field).required = true];
+	int64 strategy_uid = 2 [(buf.validate.field).required = true];
+}
+
+message RemoveStrategyFromGroupReply {}
+
+// 策略组升级模式更新消息
+message UpdateStrategyGroupUpgradeModeRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	int32 upgrade_mode = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateStrategyGroupUpgradeModeReply {}
+
+message UpdateStrategyGroupUpgradeConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string upgrade_config = 2;
+}
+
+message UpdateStrategyGroupUpgradeConfigReply {}
+
+// 接收对象相关消息
+message CreateReceiverRequest {
+	int64 namespace_uid = 1 [(buf.validate.field).required = true];
+	string type = 2 [(buf.validate.field).required = true];
+	string name = 3 [(buf.validate.field).required = true];
+	string description = 4;
+	repeated int64 user_ids = 5;
+	map<string, string> label_match = 6;
+	repeated string notify_types = 7;
+}
+
+message CreateReceiverReply {}
+
+message UpdateReceiverRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string name = 2;
+	string description = 3;
+	repeated int64 user_ids = 4;
+	map<string, string> label_match = 5;
+	repeated string notify_types = 6;
+}
+
+message UpdateReceiverReply {}
+
+message DeleteReceiverRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteReceiverReply {}
+
+message GetReceiverRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message ReceiverItem {
+	int64 uid = 1;
+	int64 namespace_uid = 2;
+	string type = 3;
+	string name = 4;
+	string description = 5;
+	repeated int64 user_ids = 6;
+	map<string, string> label_match = 7;
+	repeated string notify_types = 8;
+	int64 created_at = 9;
+	int64 updated_at = 10;
+}
+
+message ListReceiverRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	int64 namespace_uid = 3;
+	string type = 4;
+	string keyword = 5;
+}
+
+message ListReceiverReply {
+	repeated ReceiverItem receivers = 1;
+	int64 total = 2;
+}
+
+// 策略规则相关消息
+message CreateStrategyRuleRequest {
+	int64 strategy_uid = 1 [(buf.validate.field).required = true];
+	string rule_detail = 2 [(buf.validate.field).required = true];
+	int32 alert_level = 3;
+	repeated string alert_pages = 4;
+	int32 order = 5;
+}
+
+message CreateStrategyRuleReply {}
+
+message UpdateStrategyRuleRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string rule_detail = 2;
+	int32 alert_level = 3;
+	repeated string alert_pages = 4;
+	int32 order = 5;
+}
+
+message UpdateStrategyRuleReply {}
+
+message DeleteStrategyRuleRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteStrategyRuleReply {}
+
+message GetStrategyRuleRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message StrategyRuleItem {
+	int64 uid = 1;
+	int64 strategy_uid = 2;
+	string rule_detail = 3;
+	enums.GlobalStatus status = 4;
+	int32 alert_level = 5;
+	repeated string alert_pages = 6;
+	int32 order = 7;
+	int64 created_at = 8;
+	int64 updated_at = 9;
+}
+
+message ListStrategyRuleRequest {
+	int64 strategy_uid = 1 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2;
+}
+
+message ListStrategyRuleReply {
+	repeated StrategyRuleItem rules = 1;
+}
+
+message UpdateStrategyRuleStatusRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	enums.GlobalStatus status = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateStrategyRuleStatusReply {}
+
+// 策略详细配置更新消息
+message UpdateStrategyDataSourceConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	repeated int64 datasource_uids = 2;
+	string query = 3;
+	string datasource_type = 4;
+}
+
+message UpdateStrategyDataSourceConfigReply {}
+
+message UpdateStrategyAlertConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string alert_title = 2;
+	string alert_content = 3;
+	int32 alert_level = 4;
+	repeated string alert_pages = 5;
+}
+
+message UpdateStrategyAlertConfigReply {}
+
+message UpdateStrategyNotifyConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	repeated int64 receiver_uids = 2;
+}
+
+message UpdateStrategyNotifyConfigReply {}
+
+message UpdateStrategyDialTestConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string dial_test_type = 2;
+	map<string, string> dial_test_targets = 3;
+}
+
+message UpdateStrategyDialTestConfigReply {}
+
+message UpdateStrategySuppressConfigRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string suppress_type = 2;
+	string suppress_config = 3;
+}
+
+message UpdateStrategySuppressConfigReply {}
+

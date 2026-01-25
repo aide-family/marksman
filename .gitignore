@@ -54,3 +54,7 @@ bin/
 
 # data
 data/
+
+docs/
+
+AGENTS.md

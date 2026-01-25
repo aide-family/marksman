@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package sovereign.api.v1;
+
+option go_package = "github.com/aide-family/sovereign/pkg/api/v1;v1";
+option java_multiple_files = true;
+option java_package = "sovereign.api.v1";
+
+// SelectItem 通用选择项消息
+message SelectItem {
+	string value = 1;
+	string label = 2;
+	bool disabled = 3;
+	string tooltip = 4;
+}
+

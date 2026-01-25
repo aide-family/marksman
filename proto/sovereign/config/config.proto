@@ -92,6 +92,17 @@ message NamespaceConfig {
     google.protobuf.Any options = 3;
 }
 
+message DataSourceConfig {
+	enum Driver {
+		FILE = 0;
+		GORM = 1;
+		OUTER = 2;
+	}
+	Driver driver = 1;
+	string version = 2;
+	google.protobuf.Any options = 3;
+}
+
 message FileConfig {
 	enum FileType {
 		YAML = 0;

@@ -83,7 +83,7 @@ func (g *gormRepository) CreateNamespace(ctx context.Context, req *namespacev1.C
 	namespaceDo := &model.Namespace{
 		Name:     req.Name,
 		Metadata: safety.NewMap(req.Metadata),
-		Status:   uint8(req.Status),
+		Status:   int8(req.Status),
 	}
 	namespaceDo.WithCreator(1)
 	namespaceDo.WithUID(g.node.Generate())
@@ -185,12 +185,12 @@ func (g *gormRepository) SelectNamespace(ctx context.Context, req *namespacev1.S
 	case namespacev1.Order_ASC:
 		wrappers = wrappers.Order(mutation.UID.Asc())
 	}
-	if req.LastUID > 0 {
+	if req.NextUID > 0 {
 		switch req.Order {
 		case namespacev1.Order_DESC:
-			wrappers = wrappers.Where(mutation.UID.Lt(req.LastUID))
+			wrappers = wrappers.Where(mutation.UID.Lt(req.NextUID))
 		case namespacev1.Order_ASC:
-			wrappers = wrappers.Where(mutation.UID.Gt(req.LastUID))
+			wrappers = wrappers.Where(mutation.UID.Gt(req.NextUID))
 		}
 	}
 	wrappers = wrappers.Select(mutation.UID, mutation.Name, mutation.Status, mutation.DeletedAt)
@@ -205,7 +205,7 @@ func (g *gormRepository) SelectNamespace(ctx context.Context, req *namespacev1.S
 	return &namespacev1.SelectNamespaceResponse{
 		Items:   namespaces,
 		Total:   int64(len(namespaces)),
-		LastUID: queryNamespaces[len(queryNamespaces)-1].UID.Int64(),
+		NextUID: queryNamespaces[len(queryNamespaces)-1].UID.Int64(),
 		HasMore: len(queryNamespaces) == int(req.Limit),
 	}, nil
 }
@@ -224,7 +224,7 @@ func (g *gormRepository) UpdateNamespace(ctx context.Context, req *namespacev1.U
 // UpdateNamespaceStatus implements [namespacev1.Repository].
 func (g *gormRepository) UpdateNamespaceStatus(ctx context.Context, req *namespacev1.UpdateNamespaceStatusRequest) (*namespacev1.ResultInfo, error) {
 	mutation := query.Use(g.db)
-	result, err := mutation.Namespace.WithContext(ctx).Where(mutation.Namespace.UID.Eq(req.Uid)).UpdateSimple(mutation.Namespace.Status.Value(uint8(req.Status)))
+result, err := mutation.Namespace.WithContext(ctx).Where(mutation.Namespace.UID.Eq(req.Uid)).UpdateSimple(mutation.Namespace.Status.Value(uint8(req.Status)))
 	if err != nil {
 		return nil, merr.ErrorInternalServer("update namespace status failed: %v", err)
 	}

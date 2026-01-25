@@ -1,0 +1,334 @@
+syntax = "proto3";
+
+package sovereign.api.v1;
+
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/aide-family/sovereign/pkg/api/v1;v1";
+option java_multiple_files = true;
+option java_package = "sovereign.api.v1";
+
+// 事件中心服务
+service EventCenter {
+	// 实时告警相关接口
+	rpc ListRealtimeAlerts (ListRealtimeAlertsRequest) returns (ListRealtimeAlertsReply) {
+		option (google.api.http) = {
+			get: "/v1/alerts/realtime"
+		};
+	}
+	rpc GetRealtimeAlert (GetRealtimeAlertRequest) returns (RealtimeAlertItem) {
+		option (google.api.http) = {
+			get: "/v1/alert/realtime/{uid}"
+		};
+	}
+	rpc InterveneAlert (InterveneAlertRequest) returns (InterveneAlertReply) {
+		option (google.api.http) = {
+			post: "/v1/alert/{uid}/intervene"
+			body: "*"
+		};
+	}
+	rpc SuppressAlert (SuppressAlertRequest) returns (SuppressAlertReply) {
+		option (google.api.http) = {
+			post: "/v1/alert/{uid}/suppress"
+			body: "*"
+		};
+	}
+	rpc UpgradeAlert (UpgradeAlertRequest) returns (UpgradeAlertReply) {
+		option (google.api.http) = {
+			post: "/v1/alert/{uid}/upgrade"
+			body: "*"
+		};
+	}
+	rpc GetAlertEventChart (GetAlertEventChartRequest) returns (GetAlertEventChartReply) {
+		option (google.api.http) = {
+			get: "/v1/alert/{uid}/event-chart"
+		};
+	}
+
+	// 告警历史相关接口
+	rpc ListAlertHistory (ListAlertHistoryRequest) returns (ListAlertHistoryReply) {
+		option (google.api.http) = {
+			get: "/v1/alerts/history"
+		};
+	}
+	rpc GetAlertHistory (GetAlertHistoryRequest) returns (AlertHistoryItem) {
+		option (google.api.http) = {
+			get: "/v1/alert/history/{uid}"
+		};
+	}
+	rpc GetAlertRawData (GetAlertRawDataRequest) returns (GetAlertRawDataReply) {
+		option (google.api.http) = {
+			get: "/v1/alert/{uid}/raw-data"
+		};
+	}
+	rpc GetAlertEventReport (GetAlertEventReportRequest) returns (GetAlertEventReportReply) {
+		option (google.api.http) = {
+			get: "/v1/alert/{uid}/event-report"
+		};
+	}
+
+	// 通知历史相关接口
+	rpc ListNotificationHistory (ListNotificationHistoryRequest) returns (ListNotificationHistoryReply) {
+		option (google.api.http) = {
+			get: "/v1/notifications/history"
+		};
+	}
+	rpc RetryNotification (RetryNotificationRequest) returns (RetryNotificationReply) {
+		option (google.api.http) = {
+			post: "/v1/notification/{uid}/retry"
+			body: "*"
+		};
+	}
+
+	// 事件总线相关接口
+	rpc PushExternalAlert (PushExternalAlertRequest) returns (PushExternalAlertReply) {
+		option (google.api.http) = {
+			post: "/v1/event/external/alert"
+			body: "*"
+		};
+	}
+	rpc PushInternalAlert (PushInternalAlertRequest) returns (PushInternalAlertReply) {
+		option (google.api.http) = {
+			post: "/v1/event/internal/alert"
+			body: "*"
+		};
+	}
+
+	// 定时任务相关接口
+	rpc ListScheduledTasks (ListScheduledTasksRequest) returns (ListScheduledTasksReply) {
+		option (google.api.http) = {
+			get: "/v1/scheduled-tasks"
+		};
+	}
+	rpc GetScheduledTask (GetScheduledTaskRequest) returns (ScheduledTaskItem) {
+		option (google.api.http) = {
+			get: "/v1/scheduled-task/{uid}"
+		};
+	}
+	rpc UpdateScheduledTaskStatus (UpdateScheduledTaskStatusRequest) returns (UpdateScheduledTaskStatusReply) {
+		option (google.api.http) = {
+			put: "/v1/scheduled-task/{uid}/status"
+			body: "*"
+		};
+	}
+}
+
+// 实时告警相关消息
+message ListRealtimeAlertsRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	int32 alert_level = 3; // 告警等级
+	int64 strategy_uid = 4; // 策略UID
+	int64 strategy_group_uid = 5; // 策略组UID
+	string keyword = 6; // 关键词搜索
+	bool only_unhandled = 7; // 仅未处理
+}
+
+message ListRealtimeAlertsReply {
+	repeated RealtimeAlertItem alerts = 1;
+	int64 total = 2;
+}
+
+message RealtimeAlertItem {
+	int64 uid = 1;
+	int32 alert_level = 2; // 告警等级
+	int64 alert_time = 3; // 告警时间
+	int64 duration = 4; // 持续时长（秒）
+	string alert_title = 5; // 告警标题
+	string alert_content = 6; // 告警内容
+	string intervener = 7; // 介入人
+	int64 strategy_uid = 8; // 策略UID
+	int64 strategy_group_uid = 9; // 策略组UID
+	bool is_suppressed = 10; // 是否被抑制
+	bool is_upgraded = 11; // 是否已升级
+	map<string, string> labels = 12; // 标签
+	int64 created_at = 13;
+	int64 updated_at = 14;
+}
+
+message GetRealtimeAlertRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message InterveneAlertRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string log = 2; // 介入日志
+}
+
+message InterveneAlertReply {}
+
+message SuppressAlertRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	int64 suppress_duration = 2 [(buf.validate.field).required = true]; // 抑制时长（秒）
+	string reason = 3; // 抑制原因
+}
+
+message SuppressAlertReply {}
+
+message UpgradeAlertRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	repeated int64 receiver_uids = 2; // 升级通知对象列表
+	string log = 3; // 升级日志
+}
+
+message UpgradeAlertReply {}
+
+message GetAlertEventChartRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	int64 start_time = 2; // 开始时间
+	int64 end_time = 3; // 结束时间
+}
+
+message GetAlertEventChartReply {
+	string chart_data = 1; // 图表数据（JSON格式）
+}
+
+// 告警历史相关消息
+message ListAlertHistoryRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	int32 alert_level = 3;
+	int64 strategy_uid = 4;
+	int64 strategy_group_uid = 5;
+	string keyword = 6;
+	bool only_recovered = 7; // 仅已恢复
+	int64 start_time = 8; // 开始时间
+	int64 end_time = 9; // 结束时间
+}
+
+message ListAlertHistoryReply {
+	repeated AlertHistoryItem alerts = 1;
+	int64 total = 2;
+}
+
+message AlertHistoryItem {
+	int64 uid = 1;
+	int32 alert_level = 2;
+	int64 alert_time = 3;
+	int64 duration = 4; // 持续时长（秒），已恢复则为恢复前持续时长
+	bool is_recovered = 5; // 是否已恢复
+	int64 recovered_at = 6; // 恢复时间
+	string alert_title = 7;
+	string alert_content = 8;
+	int64 processing_duration = 9; // 处理耗时（从介入到恢复，秒）
+	int64 strategy_uid = 10;
+	int64 strategy_group_uid = 11;
+	map<string, string> labels = 12;
+	int64 created_at = 13;
+	int64 updated_at = 14;
+}
+
+message GetAlertHistoryRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message GetAlertRawDataRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message GetAlertRawDataReply {
+	string raw_data = 1; // 原始数据（JSON格式）
+	string recovered_raw_data = 2; // 恢复时的原始数据（JSON格式）
+}
+
+message GetAlertEventReportRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message GetAlertEventReportReply {
+	string original_report = 1; // 原始报告
+	string ai_analysis_report = 2; // AI分析报告
+}
+
+// 通知历史相关消息
+message ListNotificationHistoryRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	int64 alert_uid = 3; // 告警UID
+	string status = 4; // 状态：success/failed
+	string notify_type = 5; // 通知方式：sms/phone/email
+	int64 start_time = 6;
+	int64 end_time = 7;
+}
+
+message ListNotificationHistoryReply {
+	repeated NotificationHistoryItem notifications = 1;
+	int64 total = 2;
+}
+
+message NotificationHistoryItem {
+	int64 uid = 1;
+	int64 notification_time = 2; // 通知时间
+	string status = 3; // 状态：success/failed
+	string notify_type = 4; // 通知方式：sms/phone/email
+	string receiver = 5; // 接收者
+	string receiver_type = 6; // 接收方式
+	string content = 7; // 发送内容
+	int64 alert_uid = 8; // 告警事件唯一标识
+	int32 retry_count = 9; // 重试次数
+	int64 created_at = 10;
+	int64 updated_at = 11;
+}
+
+message RetryNotificationRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message RetryNotificationReply {}
+
+// 事件总线相关消息
+message PushExternalAlertRequest {
+	string source = 1 [(buf.validate.field).required = true]; // 来源：http/grpc
+	map<string, string> alert_data = 2 [(buf.validate.field).required = true]; // 告警数据
+}
+
+message PushExternalAlertReply {
+	int64 alert_uid = 1; // 生成的告警UID
+}
+
+message PushInternalAlertRequest {
+	string event_type = 1 [(buf.validate.field).required = true]; // 事件类型：metric/logs/trace/event/dial_test
+	map<string, string> event_data = 2 [(buf.validate.field).required = true]; // 事件数据
+}
+
+message PushInternalAlertReply {
+	int64 alert_uid = 1; // 生成的告警UID
+}
+
+// 定时任务相关消息
+message ListScheduledTasksRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	int64 strategy_uid = 3; // 策略UID
+	string executor_type = 4; // 执行器类型：metric/logs/trace/event/dial_test
+	string status = 5; // 状态：running/stopped
+}
+
+message ListScheduledTasksReply {
+	repeated ScheduledTaskItem tasks = 1;
+	int64 total = 2;
+}
+
+message ScheduledTaskItem {
+	int64 uid = 1;
+	int64 strategy_uid = 2; // 策略UID
+	string executor_type = 3; // 执行器类型
+	string status = 4; // 状态：running/stopped
+	int64 last_execute_time = 5; // 最后执行时间
+	int64 next_execute_time = 6; // 下次执行时间
+	int64 created_at = 7;
+	int64 updated_at = 8;
+}
+
+message GetScheduledTaskRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateScheduledTaskStatusRequest {
+	int64 uid = 1 [(buf.validate.field).required = true];
+	string status = 2 [(buf.validate.field).required = true]; // running/stopped
+}
+
+message UpdateScheduledTaskStatusReply {}
+
