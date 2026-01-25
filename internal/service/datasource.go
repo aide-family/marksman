@@ -8,6 +8,7 @@ import (
 
 	"github.com/aide-family/sovereign/internal/biz/datasource"
 	"github.com/aide-family/sovereign/internal/biz/shared"
+	"github.com/aide-family/sovereign/internal/biz/vobj"
 	apiv1 "github.com/aide-family/sovereign/pkg/api/v1"
 	"github.com/aide-family/sovereign/pkg/enum"
 )
@@ -143,7 +144,6 @@ func toAPIV1SelectDataSourceReply(result *datasource.SelectResult) *apiv1.Select
 	}
 	return &apiv1.SelectDataSourceReply{
 		Items:   selectItems,
-		Total:   result.Total,
 		NextUID: result.NextUID.Int64(),
 		HasMore: result.HasMore,
 	}
@@ -163,125 +163,286 @@ func (s *DataSourceService) TestConnection(ctx context.Context, req *apiv1.TestC
 	}, nil
 }
 
-// 及时查询相关接口实现（占位实现，需要后续完善 biz 层）
+// 及时查询相关接口实现
 func (s *DataSourceService) QueryDataSource(ctx context.Context, req *apiv1.QueryDataSourceRequest) (*apiv1.QueryDataSourceReply, error) {
-	// TODO: 实现数据源查询逻辑
+	result, err := s.dataSourceService.QueryDataSource(ctx, snowflake.ParseInt64(req.Uid), req.Query, req.Format)
+	if err != nil {
+		return nil, err
+	}
 	return &apiv1.QueryDataSourceReply{
-		Result: "{}",
+		Result: result,
 	}, nil
 }
 
 func (s *DataSourceService) ListQueryHistory(ctx context.Context, req *apiv1.ListQueryHistoryRequest) (*apiv1.ListQueryHistoryReply, error) {
-	// TODO: 实现查询历史记录逻辑
+	page := req.Page
+	if page <= 0 {
+		page = 1
+	}
+	pageSize := req.PageSize
+	if pageSize <= 0 {
+		pageSize = 20
+	}
+
+	histories, total, err := s.dataSourceService.ListQueryHistory(ctx, snowflake.ParseInt64(req.Uid), page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*apiv1.QueryHistoryItem, 0, len(histories))
+	for _, h := range histories {
+		items = append(items, &apiv1.QueryHistoryItem{
+			Id:        int64(h.ID()),
+			Query:     h.Query(),
+			CreatedAt: h.CreatedAt().Unix(),
+		})
+	}
+
 	return &apiv1.ListQueryHistoryReply{
-		Items: []*apiv1.QueryHistoryItem{},
-		Total:  0,
+		Items: items,
+		Total: total,
 	}, nil
 }
 
 func (s *DataSourceService) SaveQueryFavorite(ctx context.Context, req *apiv1.SaveQueryFavoriteRequest) (*apiv1.SaveQueryFavoriteReply, error) {
-	// TODO: 实现保存查询收藏逻辑
+	id, err := s.dataSourceService.SaveQueryFavorite(ctx, snowflake.ParseInt64(req.Uid), req.Name, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	return &apiv1.SaveQueryFavoriteReply{
-		FavoriteId: 0,
+		FavoriteId: int64(id),
 	}, nil
 }
 
 func (s *DataSourceService) ListQueryFavorites(ctx context.Context, req *apiv1.ListQueryFavoritesRequest) (*apiv1.ListQueryFavoritesReply, error) {
-	// TODO: 实现查询收藏列表逻辑
+	favorites, err := s.dataSourceService.ListQueryFavorites(ctx, snowflake.ParseInt64(req.Uid))
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*apiv1.QueryFavoriteItem, 0, len(favorites))
+	for _, f := range favorites {
+		items = append(items, &apiv1.QueryFavoriteItem{
+			Id:        int64(f.ID()),
+			Name:      f.Name(),
+			Query:     f.Query(),
+			CreatedAt: f.CreatedAt().Unix(),
+		})
+	}
+
 	return &apiv1.ListQueryFavoritesReply{
-		Items: []*apiv1.QueryFavoriteItem{},
+		Items: items,
 	}, nil
 }
 
 func (s *DataSourceService) DeleteQueryFavorite(ctx context.Context, req *apiv1.DeleteQueryFavoriteRequest) (*apiv1.DeleteQueryFavoriteReply, error) {
-	// TODO: 实现删除查询收藏逻辑
+	if err := s.dataSourceService.DeleteQueryFavorite(ctx, uint32(req.FavoriteId)); err != nil {
+		return nil, err
+	}
 	return &apiv1.DeleteQueryFavoriteReply{}, nil
 }
 
-// 告警模板相关接口实现（占位实现，需要后续完善 biz 层）
+// 告警模板相关接口实现
 func (s *DataSourceService) CreateAlertTemplate(ctx context.Context, req *apiv1.CreateAlertTemplateRequest) (*apiv1.CreateAlertTemplateReply, error) {
-	// TODO: 实现创建告警模板逻辑
+	if err := s.dataSourceService.CreateAlertTemplate(ctx, snowflake.ParseInt64(req.DatasourceUid), req.Name, req.TitleTemplate, req.ContentTemplate); err != nil {
+		return nil, err
+	}
 	return &apiv1.CreateAlertTemplateReply{}, nil
 }
 
 func (s *DataSourceService) UpdateAlertTemplate(ctx context.Context, req *apiv1.UpdateAlertTemplateRequest) (*apiv1.UpdateAlertTemplateReply, error) {
-	// TODO: 实现更新告警模板逻辑
+	if err := s.dataSourceService.UpdateAlertTemplate(ctx, snowflake.ParseInt64(req.Uid), req.Name, req.TitleTemplate, req.ContentTemplate); err != nil {
+		return nil, err
+	}
 	return &apiv1.UpdateAlertTemplateReply{}, nil
 }
 
 func (s *DataSourceService) DeleteAlertTemplate(ctx context.Context, req *apiv1.DeleteAlertTemplateRequest) (*apiv1.DeleteAlertTemplateReply, error) {
-	// TODO: 实现删除告警模板逻辑
+	if err := s.dataSourceService.DeleteAlertTemplate(ctx, snowflake.ParseInt64(req.Uid)); err != nil {
+		return nil, err
+	}
 	return &apiv1.DeleteAlertTemplateReply{}, nil
 }
 
 func (s *DataSourceService) GetAlertTemplate(ctx context.Context, req *apiv1.GetAlertTemplateRequest) (*apiv1.AlertTemplateItem, error) {
-	// TODO: 实现获取告警模板逻辑
-	return &apiv1.AlertTemplateItem{}, nil
+	template, err := s.dataSourceService.GetAlertTemplate(ctx, snowflake.ParseInt64(req.Uid))
+	if err != nil {
+		return nil, err
+	}
+	return toAPIV1AlertTemplateItem(template), nil
 }
 
 func (s *DataSourceService) ListAlertTemplate(ctx context.Context, req *apiv1.ListAlertTemplateRequest) (*apiv1.ListAlertTemplateReply, error) {
-	// TODO: 实现列表查询告警模板逻辑
-	return &apiv1.ListAlertTemplateReply{
-		Templates: []*apiv1.AlertTemplateItem{},
-		Total:     0,
-	}, nil
+	query := datasource.NewAlertTemplateListQuery(
+		snowflake.ParseInt64(req.DatasourceUid),
+		req.Page,
+		req.PageSize,
+		req.Keyword,
+		vobj.GlobalStatus(req.Status),
+	)
+	page, err := s.dataSourceService.ListAlertTemplate(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	return toAPIV1ListAlertTemplateReply(page), nil
 }
 
 func (s *DataSourceService) UpdateAlertTemplateStatus(ctx context.Context, req *apiv1.UpdateAlertTemplateStatusRequest) (*apiv1.UpdateAlertTemplateStatusReply, error) {
-	// TODO: 实现更新告警模板状态逻辑
+	if err := s.dataSourceService.UpdateAlertTemplateStatus(ctx, snowflake.ParseInt64(req.Uid), vobj.GlobalStatus(req.Status)); err != nil {
+		return nil, err
+	}
 	return &apiv1.UpdateAlertTemplateStatusReply{}, nil
 }
 
 func (s *DataSourceService) ApplyAlertTemplate(ctx context.Context, req *apiv1.ApplyAlertTemplateRequest) (*apiv1.ApplyAlertTemplateReply, error) {
-	// TODO: 实现应用告警模板逻辑
+	if err := s.dataSourceService.ApplyAlertTemplate(ctx, snowflake.ParseInt64(req.Uid), snowflake.ParseInt64(req.StrategyUid)); err != nil {
+		return nil, err
+	}
 	return &apiv1.ApplyAlertTemplateReply{}, nil
 }
 
-// 数据源代理相关接口实现（占位实现，需要后续完善 biz 层）
+// 辅助函数
+func toAPIV1AlertTemplateItem(template *datasource.AlertTemplate) *apiv1.AlertTemplateItem {
+	return &apiv1.AlertTemplateItem{
+		Uid:             template.UID().Int64(),
+		DatasourceUid:   template.DataSourceUID().Int64(),
+		Name:            template.Name(),
+		TitleTemplate:   template.TitleTemplate(),
+		ContentTemplate: template.ContentTemplate(),
+		Status:          enum.GlobalStatus(template.Status()),
+		CreatedAt:       template.CreatedAt().Unix(),
+		UpdatedAt:       template.UpdatedAt().Unix(),
+	}
+}
+
+func toAPIV1ListAlertTemplateReply(page *shared.Page[*datasource.AlertTemplate]) *apiv1.ListAlertTemplateReply {
+	items := make([]*apiv1.AlertTemplateItem, 0, len(page.Items))
+	for _, template := range page.Items {
+		items = append(items, toAPIV1AlertTemplateItem(template))
+	}
+	return &apiv1.ListAlertTemplateReply{
+		Templates: items,
+		Total:     page.Total,
+	}
+}
+
+// 数据源代理相关接口实现
 func (s *DataSourceService) CreateDataSourceProxy(ctx context.Context, req *apiv1.CreateDataSourceProxyRequest) (*apiv1.CreateDataSourceProxyReply, error) {
-	// TODO: 实现创建数据源代理逻辑
+	if err := s.dataSourceService.CreateDataSourceProxy(ctx, snowflake.ParseInt64(req.NamespaceUid), snowflake.ParseInt64(req.DatasourceUid), req.Type, req.Name, req.Config); err != nil {
+		return nil, err
+	}
 	return &apiv1.CreateDataSourceProxyReply{}, nil
 }
 
 func (s *DataSourceService) UpdateDataSourceProxy(ctx context.Context, req *apiv1.UpdateDataSourceProxyRequest) (*apiv1.UpdateDataSourceProxyReply, error) {
-	// TODO: 实现更新数据源代理逻辑
+	if err := s.dataSourceService.UpdateDataSourceProxy(ctx, snowflake.ParseInt64(req.Uid), req.Name, req.Config); err != nil {
+		return nil, err
+	}
 	return &apiv1.UpdateDataSourceProxyReply{}, nil
 }
 
 func (s *DataSourceService) DeleteDataSourceProxy(ctx context.Context, req *apiv1.DeleteDataSourceProxyRequest) (*apiv1.DeleteDataSourceProxyReply, error) {
-	// TODO: 实现删除数据源代理逻辑
+	if err := s.dataSourceService.DeleteDataSourceProxy(ctx, snowflake.ParseInt64(req.Uid)); err != nil {
+		return nil, err
+	}
 	return &apiv1.DeleteDataSourceProxyReply{}, nil
 }
 
 func (s *DataSourceService) GetDataSourceProxy(ctx context.Context, req *apiv1.GetDataSourceProxyRequest) (*apiv1.DataSourceProxyItem, error) {
-	// TODO: 实现获取数据源代理逻辑
-	return &apiv1.DataSourceProxyItem{}, nil
+	proxy, err := s.dataSourceService.GetDataSourceProxy(ctx, snowflake.ParseInt64(req.Uid))
+	if err != nil {
+		return nil, err
+	}
+	return toAPIV1DataSourceProxyItem(proxy), nil
 }
 
 func (s *DataSourceService) ListDataSourceProxy(ctx context.Context, req *apiv1.ListDataSourceProxyRequest) (*apiv1.ListDataSourceProxyReply, error) {
-	// TODO: 实现列表查询数据源代理逻辑
+	page := req.Page
+	if page <= 0 {
+		page = 1
+	}
+	pageSize := req.PageSize
+	if pageSize <= 0 {
+		pageSize = 20
+	}
+
+	proxies, total, err := s.dataSourceService.ListDataSourceProxy(ctx, snowflake.ParseInt64(req.NamespaceUid), page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*apiv1.DataSourceProxyItem, 0, len(proxies))
+	for _, p := range proxies {
+		items = append(items, toAPIV1DataSourceProxyItem(p))
+	}
+
 	return &apiv1.ListDataSourceProxyReply{
-		Proxies: []*apiv1.DataSourceProxyItem{},
-		Total:   0,
+		Proxies: items,
+		Total:   total,
 	}, nil
 }
 
-// 元数据管理相关接口实现（占位实现，需要后续完善 biz 层）
+// 辅助函数
+func toAPIV1DataSourceProxyItem(proxy *datasource.DataSourceProxy) *apiv1.DataSourceProxyItem {
+	return &apiv1.DataSourceProxyItem{
+		Uid:           proxy.UID().Int64(),
+		NamespaceUid:  proxy.NamespaceUID().Int64(),
+		DatasourceUid: proxy.DataSourceUID().Int64(),
+		Type:          proxy.Type(),
+		Name:          proxy.Name(),
+		Config:        proxy.Config(),
+		CreatedAt:     proxy.CreatedAt().Unix(),
+		UpdatedAt:     proxy.UpdatedAt().Unix(),
+	}
+}
+
+// 元数据管理相关接口实现
 func (s *DataSourceService) ListDataSourceMetadata(ctx context.Context, req *apiv1.ListDataSourceMetadataRequest) (*apiv1.ListDataSourceMetadataReply, error) {
-	// TODO: 实现列表查询元数据逻辑
+	metadataList, err := s.dataSourceService.ListDataSourceMetadata(ctx, snowflake.ParseInt64(req.Uid), req.MetricType)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*apiv1.DataSourceMetadataItem, 0, len(metadataList))
+	for _, m := range metadataList {
+		// TODO: 根据实际的metadata结构转换为proto格式
+		// 当前实现是简化的key-value结构，proto需要metric_name, metric_type, labels等
+		items = append(items, &apiv1.DataSourceMetadataItem{
+			MetricName:  m.Key(),
+			MetricType:  m.MetadataType(),
+			Description: m.Description(),
+			LabelCount:  0,
+			Labels:      make(map[string]*apiv1.MetadataLabelValues),
+		})
+	}
+
 	return &apiv1.ListDataSourceMetadataReply{
-		Items: []*apiv1.DataSourceMetadataItem{},
-		Total: 0,
+		Items: items,
+		Total: int64(len(items)),
 	}, nil
 }
 
 func (s *DataSourceService) GetDataSourceMetadata(ctx context.Context, req *apiv1.GetDataSourceMetadataRequest) (*apiv1.DataSourceMetadataItem, error) {
-	// TODO: 实现获取元数据详情逻辑
-	return &apiv1.DataSourceMetadataItem{}, nil
+	metadata, err := s.dataSourceService.GetDataSourceMetadata(ctx, snowflake.ParseInt64(req.Uid), req.MetricName)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: 根据实际的metadata结构转换为proto格式
+	return &apiv1.DataSourceMetadataItem{
+		MetricName:  metadata.Key(),
+		MetricType:  metadata.MetadataType(),
+		Description: metadata.Description(),
+		LabelCount:  0,
+		Labels:      make(map[string]*apiv1.MetadataLabelValues),
+	}, nil
 }
 
 func (s *DataSourceService) RefreshDataSourceMetadata(ctx context.Context, req *apiv1.RefreshDataSourceMetadataRequest) (*apiv1.RefreshDataSourceMetadataReply, error) {
-	// TODO: 实现刷新元数据逻辑
+	if err := s.dataSourceService.RefreshDataSourceMetadata(ctx, snowflake.ParseInt64(req.Uid)); err != nil {
+		return nil, err
+	}
+	// TODO: 返回实际刷新的metric数量
 	return &apiv1.RefreshDataSourceMetadataReply{
 		MetricCount: 0,
 	}, nil

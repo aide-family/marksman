@@ -1,4 +1,3 @@
-// Package model is the model package for the datasource service.
 package model
 
 import (
@@ -7,18 +6,18 @@ import (
 	"github.com/bwmarrin/snowflake"
 )
 
-const TableNameDataSourceProxies = "data_source_proxies"
+const TableNameDataSourceProxy = "data_source_proxy"
 
+// DataSourceProxy 数据源代理模型
 type DataSourceProxy struct {
 	gormmodel.BaseModel
-
-	DataSourceUID snowflake.ID               `gorm:"column:data_source_uid;not null;index"`
-	ProxyType     string                     `gorm:"column:proxy_type;type:varchar(20);not null;index"`
-	Status        int8                       `gorm:"column:status;type:tinyint;not null;default:0"`
-	Endpoint      string                     `gorm:"column:endpoint;type:varchar(255);not null;"`
-	Config        *safety.Map[string, string] `gorm:"column:config;type:json;"`
+	NamespaceUID  snowflake.ID               `gorm:"column:namespace_uid;type:bigint;not null;index"`
+	DataSourceUID snowflake.ID               `gorm:"column:datasource_uid;type:bigint;not null;index"`
+	Type          string                     `gorm:"column:type;type:varchar(50);not null"`
+	Name          string                     `gorm:"column:name;type:varchar(100);not null"`
+	Config        *safety.Map[string, string] `gorm:"column:config;type:json"`
 }
 
 func (DataSourceProxy) TableName() string {
-	return TableNameDataSourceProxies
+	return TableNameDataSourceProxy
 }

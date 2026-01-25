@@ -18,6 +18,274 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/sovereign.api.v1.HealthCheckReply'
+    /v1/alert/history/{uid}:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetAlertHistory
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.AlertHistoryItem'
+    /v1/alert/realtime/{uid}:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetRealtimeAlert
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.RealtimeAlertItem'
+    /v1/alert/{uid}/event-chart:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetAlertEventChart
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.GetAlertEventChartReply'
+    /v1/alert/{uid}/event-report:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetAlertEventReport
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.GetAlertEventReportReply'
+    /v1/alert/{uid}/intervene:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_InterveneAlert
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.InterveneAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.InterveneAlertReply'
+    /v1/alert/{uid}/raw-data:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetAlertRawData
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.GetAlertRawDataReply'
+    /v1/alert/{uid}/suppress:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_SuppressAlert
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.SuppressAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.SuppressAlertReply'
+    /v1/alert/{uid}/upgrade:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_UpgradeAlert
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpgradeAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpgradeAlertReply'
+    /v1/alerts/history:
+        get:
+            tags:
+                - EventCenter
+            description: 告警历史相关接口
+            operationId: EventCenter_ListAlertHistory
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: alertLevel
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: strategyUid
+                  in: query
+                  schema:
+                    type: string
+                - name: strategyGroupUid
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: onlyRecovered
+                  in: query
+                  schema:
+                    type: boolean
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListAlertHistoryReply'
+    /v1/alerts/realtime:
+        get:
+            tags:
+                - EventCenter
+            description: 实时告警相关接口
+            operationId: EventCenter_ListRealtimeAlerts
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: alertLevel
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: strategyUid
+                  in: query
+                  schema:
+                    type: string
+                - name: strategyGroupUid
+                  in: query
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: onlyUnhandled
+                  in: query
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListRealtimeAlertsReply'
     /v1/datasource:
         post:
             tags:
@@ -711,6 +979,43 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/sovereign.api.v1.SelectDataSourceReply'
+    /v1/event/external/alert:
+        post:
+            tags:
+                - EventCenter
+            description: 事件总线相关接口
+            operationId: EventCenter_PushExternalAlert
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.PushExternalAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.PushExternalAlertReply'
+    /v1/event/internal/alert:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_PushInternalAlert
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.PushInternalAlertRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.PushInternalAlertReply'
     /v1/namespace:
         post:
             tags:
@@ -874,6 +1179,74 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/sovereign.api.v1.SelectNamespaceReply'
+    /v1/notification/{uid}/retry:
+        post:
+            tags:
+                - EventCenter
+            operationId: EventCenter_RetryNotification
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.RetryNotificationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.RetryNotificationReply'
+    /v1/notifications/history:
+        get:
+            tags:
+                - EventCenter
+            description: 通知历史相关接口
+            operationId: EventCenter_ListNotificationHistory
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: alertUid
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+                - name: notifyType
+                  in: query
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListNotificationHistoryReply'
     /v1/receiver:
         post:
             tags:
@@ -986,6 +1359,84 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/sovereign.api.v1.ListReceiverReply'
+    /v1/scheduled-task/{uid}:
+        get:
+            tags:
+                - EventCenter
+            operationId: EventCenter_GetScheduledTask
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ScheduledTaskItem'
+    /v1/scheduled-task/{uid}/status:
+        put:
+            tags:
+                - EventCenter
+            operationId: EventCenter_UpdateScheduledTaskStatus
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/sovereign.api.v1.UpdateScheduledTaskStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.UpdateScheduledTaskStatusReply'
+    /v1/scheduled-tasks:
+        get:
+            tags:
+                - EventCenter
+            description: 定时任务相关接口
+            operationId: EventCenter_ListScheduledTasks
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: strategyUid
+                  in: query
+                  schema:
+                    type: string
+                - name: executorType
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/sovereign.api.v1.ListScheduledTasksReply'
     /v1/strategies:
         get:
             tags:
@@ -1981,6 +2432,40 @@ components:
                     type: string
                 strategyUid:
                     type: string
+        sovereign.api.v1.AlertHistoryItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                alertLevel:
+                    type: integer
+                    format: int32
+                alertTime:
+                    type: string
+                duration:
+                    type: string
+                isRecovered:
+                    type: boolean
+                recoveredAt:
+                    type: string
+                alertTitle:
+                    type: string
+                alertContent:
+                    type: string
+                processingDuration:
+                    type: string
+                strategyUid:
+                    type: string
+                strategyGroupUid:
+                    type: string
+                labels:
+                    type: object
+                    additionalProperties:
+                        type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
         sovereign.api.v1.AlertTemplateItem:
             type: object
             properties:
@@ -2284,6 +2769,25 @@ components:
         sovereign.api.v1.DeleteSubscriptionReply:
             type: object
             properties: {}
+        sovereign.api.v1.GetAlertEventChartReply:
+            type: object
+            properties:
+                chartData:
+                    type: string
+        sovereign.api.v1.GetAlertEventReportReply:
+            type: object
+            properties:
+                originalReport:
+                    type: string
+                aiAnalysisReport:
+                    type: string
+        sovereign.api.v1.GetAlertRawDataReply:
+            type: object
+            properties:
+                rawData:
+                    type: string
+                recoveredRawData:
+                    type: string
         sovereign.api.v1.HealthCheckReply:
             type: object
             properties:
@@ -2294,6 +2798,25 @@ components:
                 timestamp:
                     type: string
                     format: date-time
+        sovereign.api.v1.InterveneAlertReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.InterveneAlertRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                log:
+                    type: string
+        sovereign.api.v1.ListAlertHistoryReply:
+            type: object
+            properties:
+                alerts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.AlertHistoryItem'
+                total:
+                    type: string
         sovereign.api.v1.ListAlertTemplateReply:
             type: object
             properties:
@@ -2351,6 +2874,15 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/sovereign.api.v1.NamespaceItem'
+        sovereign.api.v1.ListNotificationHistoryReply:
+            type: object
+            properties:
+                notifications:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.NotificationHistoryItem'
+                total:
+                    type: string
         sovereign.api.v1.ListQueryFavoritesReply:
             type: object
             properties:
@@ -2367,6 +2899,15 @@ components:
                         $ref: '#/components/schemas/sovereign.api.v1.QueryHistoryItem'
                 total:
                     type: string
+        sovereign.api.v1.ListRealtimeAlertsReply:
+            type: object
+            properties:
+                alerts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.RealtimeAlertItem'
+                total:
+                    type: string
         sovereign.api.v1.ListReceiverReply:
             type: object
             properties:
@@ -2374,6 +2915,15 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/sovereign.api.v1.ReceiverItem'
+                total:
+                    type: string
+        sovereign.api.v1.ListScheduledTasksReply:
+            type: object
+            properties:
+                tasks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/sovereign.api.v1.ScheduledTaskItem'
                 total:
                     type: string
         sovereign.api.v1.ListStrategyGroupReply:
@@ -2446,6 +2996,61 @@ components:
                     type: boolean
                 tooltip:
                     type: string
+        sovereign.api.v1.NotificationHistoryItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                notificationTime:
+                    type: string
+                status:
+                    type: string
+                notifyType:
+                    type: string
+                receiver:
+                    type: string
+                receiverType:
+                    type: string
+                content:
+                    type: string
+                alertUid:
+                    type: string
+                retryCount:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        sovereign.api.v1.PushExternalAlertReply:
+            type: object
+            properties:
+                alertUid:
+                    type: string
+        sovereign.api.v1.PushExternalAlertRequest:
+            type: object
+            properties:
+                source:
+                    type: string
+                alertData:
+                    type: object
+                    additionalProperties:
+                        type: string
+            description: 事件总线相关消息
+        sovereign.api.v1.PushInternalAlertReply:
+            type: object
+            properties:
+                alertUid:
+                    type: string
+        sovereign.api.v1.PushInternalAlertRequest:
+            type: object
+            properties:
+                eventType:
+                    type: string
+                eventData:
+                    type: object
+                    additionalProperties:
+                        type: string
         sovereign.api.v1.QueryDataSourceReply:
             type: object
             properties:
@@ -2480,6 +3085,40 @@ components:
                 query:
                     type: string
                 createdAt:
+                    type: string
+        sovereign.api.v1.RealtimeAlertItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                alertLevel:
+                    type: integer
+                    format: int32
+                alertTime:
+                    type: string
+                duration:
+                    type: string
+                alertTitle:
+                    type: string
+                alertContent:
+                    type: string
+                intervener:
+                    type: string
+                strategyUid:
+                    type: string
+                strategyGroupUid:
+                    type: string
+                isSuppressed:
+                    type: boolean
+                isUpgraded:
+                    type: boolean
+                labels:
+                    type: object
+                    additionalProperties:
+                        type: string
+                createdAt:
+                    type: string
+                updatedAt:
                     type: string
         sovereign.api.v1.ReceiverItem:
             type: object
@@ -2524,6 +3163,14 @@ components:
         sovereign.api.v1.RemoveStrategyFromGroupReply:
             type: object
             properties: {}
+        sovereign.api.v1.RetryNotificationReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.RetryNotificationRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
         sovereign.api.v1.SaveQueryFavoriteReply:
             type: object
             properties:
@@ -2537,6 +3184,25 @@ components:
                 query:
                     type: string
                 name:
+                    type: string
+        sovereign.api.v1.ScheduledTaskItem:
+            type: object
+            properties:
+                uid:
+                    type: string
+                strategyUid:
+                    type: string
+                executorType:
+                    type: string
+                status:
+                    type: string
+                lastExecuteTime:
+                    type: string
+                nextExecuteTime:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
                     type: string
         sovereign.api.v1.SelectDataSourceReply:
             type: object
@@ -2712,6 +3378,18 @@ components:
                     type: string
                 updatedAt:
                     type: string
+        sovereign.api.v1.SuppressAlertReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.SuppressAlertRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                suppressDuration:
+                    type: string
+                reason:
+                    type: string
         sovereign.api.v1.TestConnectionReply:
             type: object
             properties:
@@ -2848,6 +3526,16 @@ components:
                     type: array
                     items:
                         type: string
+        sovereign.api.v1.UpdateScheduledTaskStatusReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpdateScheduledTaskStatusRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                status:
+                    type: string
         sovereign.api.v1.UpdateStrategyAlertConfigReply:
             type: object
             properties: {}
@@ -3093,8 +3781,24 @@ components:
                     type: array
                     items:
                         type: string
+        sovereign.api.v1.UpgradeAlertReply:
+            type: object
+            properties: {}
+        sovereign.api.v1.UpgradeAlertRequest:
+            type: object
+            properties:
+                uid:
+                    type: string
+                receiverUids:
+                    type: array
+                    items:
+                        type: string
+                log:
+                    type: string
 tags:
     - name: DataSource
+    - name: EventCenter
+      description: 事件中心服务
     - name: Health
     - name: Namespace
     - name: Strategy

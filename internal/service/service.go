@@ -10,4 +10,5 @@ var ProviderSetService = wire.NewSet(
 	NewDataSourceService,
 	NewStrategyService,
 	NewSubscriptionService,
+	NewEventCenterService,
 )
