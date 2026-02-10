@@ -1,4 +1,4 @@
-// Package biz is the business logic for the Sovereign service.
+// Package biz is the business logic for the marksman service.
 package biz
 
 import "github.com/google/wire"
@@ -6,4 +6,5 @@ import "github.com/google/wire"
 var ProviderSetBiz = wire.NewSet(
 	NewHealth,
 	NewNamespace,
+	NewLoginBiz,
 )

@@ -10,20 +10,20 @@ ifeq ($(GOHOSTOS), windows)
 	#to see https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/find.
 	#changed to use git-bash.exe to run find cli or other cli friendly, caused of every developer has a Git.
 	Git_Bash=$(subst \,/,$(subst cmd\,bin\bash.exe,$(dir $(shell where git))))
-	API_PROTO_FILES=$(shell $(Git_Bash) -c "find proto/sovereign -name *.proto")
+	API_PROTO_FILES=$(shell $(Git_Bash) -c "find pkg/magicbox/proto/marksman -name *.proto")
 	# Use mkdir -p equivalent for Windows
 	MKDIR=mkdir
 	RM=del /f /q
 else
-	API_PROTO_FILES=$(shell find proto/sovereign -name *.proto)
+	API_PROTO_FILES=$(shell find pkg/magicbox/proto/marksman -name *.proto)
 	MKDIR=mkdir -p
 	RM=rm -f
 endif
 
 .PHONY: init
-# initialize the sovereign environment
+# initialize the marksman environment
 init:
-	@echo "Initializing sovereign environment"
+	@echo "Initializing marksman environment"
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.3
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
@@ -40,8 +40,8 @@ init:
 conf:
 	@echo "Generating conf files"
 	protoc --proto_path=./internal/conf \
-           --proto_path=./proto/sovereign \
-           --proto_path=./proto/third_party \
+           --proto_path=./pkg/magicbox/proto/third_party \
+		   --proto_path=./pkg/magicbox/proto \
            --go_out=paths=source_relative:./internal/conf \
            --experimental_allow_proto3_optional \
            ./internal/conf/*.proto
@@ -50,18 +50,11 @@ conf:
 # generate the api files
 api:
 	@echo "Generating api files"
-	@if [ "$(GOHOSTOS)" = "windows" ]; then \
-		$(Git_Bash) -c "rm -rf ./pkg/*.pb.go"; \
-		if [ ! -d "./pkg" ]; then $(MKDIR) ./pkg; fi \
-	else \
-		rm -rf ./pkg/*.pb.go; \
-		if [ ! -d "./pkg" ]; then $(MKDIR) ./pkg; fi \
-	fi
-	protoc --proto_path=./proto/sovereign \
-	       --proto_path=./proto/third_party \
- 	       --go_out=paths=source_relative:./pkg \
- 	       --go-http_out=paths=source_relative:./pkg \
- 	       --go-grpc_out=paths=source_relative:./pkg \
+	protoc --proto_path=./pkg/magicbox/proto \
+	       --proto_path=./pkg/magicbox/proto/third_party \
+ 	       --go_out=. --go_opt=module=github.com/aide-family/marksman \
+ 	       --go-http_out=. --go-http_opt=module=github.com/aide-family/marksman \
+ 	       --go-grpc_out=. --go-grpc_opt=module=github.com/aide-family/marksman \
 	       --openapi_out=fq_schema_naming=true,default_response=false:./internal/server/swagger \
 	       --experimental_allow_proto3_optional \
 	       $(API_PROTO_FILES)
@@ -72,50 +65,42 @@ wire:
 	@echo "Generating wire files"
 	wire ./...
 
-.PHONY: vobj
-# generate the vobj files
-vobj:
-	@echo "Generating vobj files"
-	cd internal/biz/vobj && go generate .
-
-.PHONY: errors
-# generate errors
-errors:
-	@echo "Generating errors"
-	@if [ "$(GOHOSTOS)" = "windows" ]; then \
-		$(Git_Bash) -c "rm -rf ./pkg/merr/*.pb.go"; \
-		if [ ! -d "./pkg/merr" ]; then $(MKDIR) ./pkg/merr; fi \
-	else \
-		rm -rf ./pkg/merr/*.pb.go; \
-		if [ ! -d "./pkg/merr" ]; then $(MKDIR) ./pkg/merr; fi \
-	fi
-	protoc --proto_path=./proto/sovereign/merr \
-           --proto_path=./proto/third_party \
-           --go_out=paths=source_relative:./pkg/merr \
-           --go-errors_out=paths=source_relative:./pkg/merr \
-           ./proto/sovereign/merr/*.proto
-
 .PHONY: all
 # generate all files
-all: 
+all:
 	@git log -1 --format='%B' > description.txt
-	make api conf errors vobj wire
+	git submodule update --init --recursive
+	@(cd pkg/magicbox && git clean -fd && git submodule foreach --recursive 'git clean -fd'; test -f proto/.git 2>/dev/null && rm -rf proto) 2>/dev/null || true
+	git submodule update --remote --recursive
+	make api conf wire
 
 .PHONY: build
-# build the sovereign binary
+# build the marksman binary
 build: all
-	@echo "Building sovereign"
+	@echo "Building marksman"
 	@echo "VERSION: $(VERSION)"
 	@echo "BUILD_TIME: $(BUILD_TIME)"
 	@echo "AUTHOR: $(AUTHOR)"
 	@echo "AUTHOR_EMAIL: $(AUTHOR_EMAIL)"
 	@git log -1 --format='%B' > description.txt
-	go build -ldflags "-X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -X main.Author=$(AUTHOR) -X main.Email=$(AUTHOR_EMAIL) -X main.Repo=$(REPO)" -o bin/sovereign main.go
+	go build -ldflags "-X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -X main.Author=$(AUTHOR) -X main.Email=$(AUTHOR_EMAIL) -X main.Repo=$(REPO)" -o bin/marksman main.go
+
+.PHONY: build-exe
+# build the marksman binary for windows
+build-exe: all
+	@echo "Building marksman"
+	@echo "VERSION: $(VERSION)"
+	@echo "BUILD_TIME: $(BUILD_TIME)"
+	@echo "AUTHOR: $(AUTHOR)"
+	@echo "AUTHOR_EMAIL: $(AUTHOR_EMAIL)"
+	@git log -1 --format='%B' > description.txt
+	GOOS=windows GOARCH=amd64 go build -ldflags "-X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -X main.Author=$(AUTHOR) -X main.Email=$(AUTHOR_EMAIL) -X main.Repo=$(REPO)" -o bin/marksman.exe main.go
+
 
 .PHONY: dev
-# run the sovereign binary in development mode
+# run the marksman binary in development mode
 dev:
-	@echo "Running sovereign in development mode"
+	@echo "Running marksman in development mode"
 	go run . run all --log-level=DEBUG
 
 .PHONY: test

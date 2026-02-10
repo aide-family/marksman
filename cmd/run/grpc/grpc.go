@@ -5,16 +5,16 @@ import (
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
 
-	"github.com/aide-family/sovereign/cmd"
-	"github.com/aide-family/sovereign/cmd/run"
+	"github.com/aide-family/marksman/cmd"
+	"github.com/aide-family/marksman/cmd/run"
 )
 
-const cmdGRPCLong = `Start the Sovereign gRPC service only`
+const cmdGRPCLong = `Start the marksman gRPC service only`
 
 func NewCmd() *cobra.Command {
 	runCmd := &cobra.Command{
 		Use:   "grpc",
-		Short: "Start the Sovereign gRPC service only",
+		Short: "Start the marksman gRPC service only",
 		Long:  cmdGRPCLong,
 		Annotations: map[string]string{
 			"group": cmd.ServiceCommands,

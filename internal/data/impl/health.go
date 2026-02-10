@@ -1,8 +1,8 @@
 package impl
 
 import (
-	"github.com/aide-family/sovereign/internal/biz/repository"
-	"github.com/aide-family/sovereign/internal/data"
+	"github.com/aide-family/marksman/internal/biz/repository"
+	"github.com/aide-family/marksman/internal/data"
 )
 
 func NewHealthRepository(d *data.Data) repository.Health {

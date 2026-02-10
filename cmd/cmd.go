@@ -2,7 +2,7 @@
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 */
 
-// Package cmd is the root command for the Sovereign service
+// Package cmd is the root command for the marksman service
 package cmd
 
 import (
@@ -13,10 +13,9 @@ import (
 
 	"github.com/aide-family/magicbox/log"
 	"github.com/aide-family/magicbox/log/stdio"
+	"github.com/aide-family/magicbox/merr"
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
-
-	"github.com/aide-family/sovereign/pkg/merr"
 )
 
 // Command groups for organized help display
@@ -28,14 +27,14 @@ const (
 	DatabaseCommands = "Database Commands"
 )
 
-const cmdLong = `Sovereign (太阴星君) is the service governance platform for the Moon platform, providing unified service governance capabilities.
+const cmdLong = `marksman (太阴星君) is the service governance platform for the Moon platform, providing unified service governance capabilities.
 
-Use "sovereign [command] --help" to view detailed information about a specific command.`
+Use "marksman [command] --help" to view detailed information about a specific command.`
 
 func NewCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "sovereign",
-		Short: "Moon service governance platform - Sovereign service",
+		Use:   "marksman",
+		Short: "Moon service governance platform - marksman service",
 		Long:  cmdLong,
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
@@ -43,7 +42,7 @@ func NewCmd() *cobra.Command {
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			logger, err := log.NewLogger(stdio.LoggerDriver())
 			if err != nil {
-				panic(merr.ErrorInternal("new logger failed with error: %v", err).WithCause(err))
+				panic(merr.ErrorInternalServer("new logger failed with error: %v", err).WithCause(err))
 			}
 			logger = klog.With(logger,
 				"ts", klog.DefaultTimestamp,

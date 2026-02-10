@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/aide-family/magicbox/jwt"
 	"github.com/aide-family/magicbox/server/middler"
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware"
@@ -11,9 +12,8 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
-	"github.com/aide-family/sovereign/internal/conf"
-	"github.com/aide-family/sovereign/internal/service"
-	sovereignMiddler "github.com/aide-family/sovereign/pkg/middler"
+	"github.com/aide-family/marksman/internal/conf"
+	"github.com/aide-family/marksman/internal/service"
 )
 
 // NewHTTPServer new an HTTP server.
@@ -23,14 +23,14 @@ func NewHTTPServer(bc *conf.Bootstrap, namespaceService *service.NamespaceServic
 
 func newHTTPServer(httpConf conf.ServerConfig, jwtConf conf.JWTConfig, namespaceService *service.NamespaceService, helper *klog.Helper) *http.Server {
 	selectorNamespaceMiddlewares := []middleware.Middleware{
-		sovereignMiddler.MustNamespace(),
-		sovereignMiddler.MustNamespaceExist(namespaceService.HasNamespace),
+		middler.MustNamespace(),
+		middler.MustNamespaceExist(namespaceService.HasNamespace),
 	}
 	namespaceMiddleware := selector.Server(selectorNamespaceMiddlewares...).Match(middler.AllowListMatcher(namespaceAllowList...)).Build()
 	selectorMustAuthMiddlewares := []middleware.Middleware{
-		sovereignMiddler.JwtServe(jwtConf.GetSecret()),
-		sovereignMiddler.MustLogin(),
-		sovereignMiddler.BindJwtToken(),
+		middler.JwtServe(jwtConf.GetSecret(), &jwt.JwtClaims{}),
+		middler.MustLogin(),
+		middler.BindJwtToken(),
 		namespaceMiddleware,
 	}
 	authMiddleware := selector.Server(selectorMustAuthMiddlewares...).Match(middler.AllowListMatcher(authAllowList...)).Build()
@@ -45,7 +45,7 @@ func newHTTPServer(httpConf conf.ServerConfig, jwtConf conf.JWTConfig, namespace
 	}
 
 	opts := []http.ServerOption{
-		sovereignMiddler.Cors(),
+		middler.DefaultCors(),
 		http.Middleware(httpMiddlewares...),
 	}
 	if network := httpConf.GetNetwork(); network != "" {

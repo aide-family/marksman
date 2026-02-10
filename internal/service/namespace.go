@@ -3,16 +3,15 @@ package service
 import (
 	"context"
 
+	"github.com/aide-family/magicbox/contextx"
+	"github.com/aide-family/magicbox/enum"
+	"github.com/aide-family/magicbox/merr"
+	"github.com/aide-family/magicbox/strutil/cnst"
 	"github.com/bwmarrin/snowflake"
 
-	"github.com/aide-family/magicbox/strutil"
-	"github.com/aide-family/magicbox/strutil/cnst"
-
-	"github.com/aide-family/sovereign/internal/biz"
-	"github.com/aide-family/sovereign/internal/biz/bo"
-	apiv1 "github.com/aide-family/sovereign/pkg/api/v1"
-	"github.com/aide-family/sovereign/pkg/merr"
-	"github.com/aide-family/sovereign/pkg/middler"
+	namespacev1 "github.com/aide-family/magicbox/api/v1"
+	"github.com/aide-family/marksman/internal/biz"
+	"github.com/aide-family/marksman/internal/biz/bo"
 )
 
 func NewNamespaceService(namespaceBiz *biz.Namespace) *NamespaceService {
@@ -22,43 +21,12 @@ func NewNamespaceService(namespaceBiz *biz.Namespace) *NamespaceService {
 }
 
 type NamespaceService struct {
-	apiv1.UnimplementedNamespaceServer
+	namespacev1.UnimplementedNamespaceServer
 
 	namespaceBiz *biz.Namespace
 }
 
-func (s *NamespaceService) CreateNamespace(ctx context.Context, req *apiv1.CreateNamespaceRequest) (*apiv1.CreateNamespaceReply, error) {
-	createNamespaceBo := bo.NewCreateNamespaceBo(req)
-	if err := s.namespaceBiz.CreateNamespace(ctx, createNamespaceBo); err != nil {
-		return nil, err
-	}
-	return &apiv1.CreateNamespaceReply{}, nil
-}
-
-func (s *NamespaceService) UpdateNamespace(ctx context.Context, req *apiv1.UpdateNamespaceRequest) (*apiv1.UpdateNamespaceReply, error) {
-	updateNamespaceBo := bo.NewUpdateNamespaceBo(req)
-	if err := s.namespaceBiz.UpdateNamespace(ctx, updateNamespaceBo); err != nil {
-		return nil, err
-	}
-	return &apiv1.UpdateNamespaceReply{}, nil
-}
-
-func (s *NamespaceService) UpdateNamespaceStatus(ctx context.Context, req *apiv1.UpdateNamespaceStatusRequest) (*apiv1.UpdateNamespaceStatusReply, error) {
-	updateNamespaceStatusBo := bo.NewUpdateNamespaceStatusBo(req)
-	if err := s.namespaceBiz.UpdateNamespaceStatus(ctx, updateNamespaceStatusBo); err != nil {
-		return nil, err
-	}
-	return &apiv1.UpdateNamespaceStatusReply{}, nil
-}
-
-func (s *NamespaceService) DeleteNamespace(ctx context.Context, req *apiv1.DeleteNamespaceRequest) (*apiv1.DeleteNamespaceReply, error) {
-	if err := s.namespaceBiz.DeleteNamespace(ctx, snowflake.ParseInt64(req.Uid)); err != nil {
-		return nil, err
-	}
-	return &apiv1.DeleteNamespaceReply{}, nil
-}
-
-func (s *NamespaceService) GetNamespace(ctx context.Context, req *apiv1.GetNamespaceRequest) (*apiv1.NamespaceItem, error) {
+func (s *NamespaceService) GetNamespace(ctx context.Context, req *namespacev1.GetNamespaceRequest) (*namespacev1.NamespaceItem, error) {
 	namespaceItemBo, err := s.namespaceBiz.GetNamespace(ctx, snowflake.ParseInt64(req.Uid))
 	if err != nil {
 		return nil, err
@@ -66,16 +34,7 @@ func (s *NamespaceService) GetNamespace(ctx context.Context, req *apiv1.GetNames
 	return namespaceItemBo.ToAPIV1NamespaceItem(), nil
 }
 
-func (s *NamespaceService) ListNamespace(ctx context.Context, req *apiv1.ListNamespaceRequest) (*apiv1.ListNamespaceReply, error) {
-	listNamespaceBo := bo.NewListNamespaceBo(req)
-	listNamespacePageResponseBo, err := s.namespaceBiz.ListNamespace(ctx, listNamespaceBo)
-	if err != nil {
-		return nil, err
-	}
-	return bo.ToAPIV1ListNamespaceReply(listNamespacePageResponseBo), nil
-}
-
-func (s *NamespaceService) SelectNamespace(ctx context.Context, req *apiv1.SelectNamespaceRequest) (*apiv1.SelectNamespaceReply, error) {
+func (s *NamespaceService) SelectNamespace(ctx context.Context, req *namespacev1.SelectNamespaceRequest) (*namespacev1.SelectNamespaceReply, error) {
 	selectBo := bo.NewSelectNamespaceBo(req)
 	result, err := s.namespaceBiz.SelectNamespace(ctx, selectBo)
 	if err != nil {
@@ -84,20 +43,20 @@ func (s *NamespaceService) SelectNamespace(ctx context.Context, req *apiv1.Selec
 	return bo.ToAPIV1SelectNamespaceReply(result), nil
 }
 
-func (s *NamespaceService) HasNamespace(ctx context.Context) error {
-	ns := middler.GetNamespace(ctx)
-	if strutil.IsEmpty(ns) {
-		return merr.ErrorForbidden("namespace is required, please set the namespace in the request header or metadata, Example: %s: default", cnst.HTTPHeaderXNamespace)
+func (s *NamespaceService) HasNamespace(ctx context.Context) (snowflake.ID, error) {
+	namespace := contextx.GetNamespace(ctx)
+	if namespace <= 0 {
+		return 0, merr.ErrorForbidden("namespace is required, please set the namespace in the request header or metadata, Example: %s: default", cnst.HTTPHeaderXNamespace)
 	}
-	namespaceItemBo, err := s.namespaceBiz.GetNamespaceByName(ctx, ns)
+	namespaceItemBo, err := s.namespaceBiz.GetNamespace(ctx, namespace)
 	if err != nil {
 		if merr.IsNotFound(err) {
-			return merr.ErrorForbidden("namespace %s not found", ns)
+			return 0, merr.ErrorForbidden("namespace %s not allowed", namespace)
 		}
-		return err
+		return 0, err
 	}
-	if !namespaceItemBo.Status.IsEnabled() {
-		return merr.ErrorForbidden("namespace %s is not enabled", ns)
+	if namespaceItemBo.Status != enum.GlobalStatus_ENABLED {
+		return 0, merr.ErrorForbidden("namespace %s is not allowed", namespace)
 	}
-	return nil
+	return namespaceItemBo.UID, nil
 }

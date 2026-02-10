@@ -1,4 +1,4 @@
-// Package version is the version command for the Sovereign service
+// Package version is the version command for the marksman service
 package version
 
 import (
@@ -9,7 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v2/encoding"
 	"github.com/spf13/cobra"
 
-	"github.com/aide-family/sovereign/cmd"
+	"github.com/aide-family/marksman/cmd"
 )
 
 const txtTemplate = `Name:	{{.Name}}

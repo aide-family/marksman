@@ -5,16 +5,16 @@ import (
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
 
-	"github.com/aide-family/sovereign/cmd"
-	"github.com/aide-family/sovereign/cmd/run"
+	"github.com/aide-family/marksman/cmd"
+	"github.com/aide-family/marksman/cmd/run"
 )
 
-const cmdHTTPLong = `Start the Sovereign HTTP service only`
+const cmdHTTPLong = `Start the marksman HTTP service only`
 
 func NewCmd() *cobra.Command {
 	runCmd := &cobra.Command{
 		Use:   "http",
-		Short: "Start the Sovereign HTTP service only",
+		Short: "Start the marksman HTTP service only",
 		Long:  cmdHTTPLong,
 		Annotations: map[string]string{
 			"group": cmd.ServiceCommands,

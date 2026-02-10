@@ -3,7 +3,7 @@ package version
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/aide-family/sovereign/cmd"
+	"github.com/aide-family/marksman/cmd"
 )
 
 type Flags struct {

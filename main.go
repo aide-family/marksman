@@ -6,25 +6,25 @@ import (
 
 	"github.com/aide-family/magicbox/log"
 	"github.com/aide-family/magicbox/log/stdio"
+	"github.com/aide-family/magicbox/merr"
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
 
-	"github.com/aide-family/sovereign/cmd"
-	"github.com/aide-family/sovereign/cmd/run"
-	"github.com/aide-family/sovereign/cmd/run/all"
-	"github.com/aide-family/sovereign/cmd/run/grpc"
-	"github.com/aide-family/sovereign/cmd/run/http"
-	"github.com/aide-family/sovereign/cmd/version"
-	"github.com/aide-family/sovereign/pkg/merr"
+	"github.com/aide-family/marksman/cmd"
+	"github.com/aide-family/marksman/cmd/run"
+	"github.com/aide-family/marksman/cmd/run/all"
+	"github.com/aide-family/marksman/cmd/run/grpc"
+	"github.com/aide-family/marksman/cmd/run/http"
+	"github.com/aide-family/marksman/cmd/version"
 )
 
 var (
-	Name        = "sovereign"
+	Name        = "marksman"
 	Version     = "latest"
 	BuildTime   = "now"
 	Author      = ""
 	Email       = ""
-	Repo        = "https://github.com/aide-family/sovereign"
+	Repo        = "https://github.com/aide-family/marksman"
 	hostname, _ = os.Hostname()
 )
 
@@ -48,7 +48,7 @@ func init() {
 
 	logger, err := log.NewLogger(stdio.LoggerDriver())
 	if err != nil {
-		panic(merr.ErrorInternal("new logger failed with error: %v", err).WithCause(err))
+		panic(merr.ErrorInternalServer("new logger failed with error: %v", err).WithCause(err))
 	}
 	logger = klog.With(logger,
 		"ts", klog.DefaultTimestamp,

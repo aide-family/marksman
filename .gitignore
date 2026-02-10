@@ -42,7 +42,7 @@ cmd/**/*_gen.go
 # deploy
 deploy/*/data
 description.txt
-.rabbit/
+.marksman/
 *.log
 *__string.go
 
@@ -52,5 +52,4 @@ description.txt
 # bin
 bin/
 
-# data
-data/
+.data/

@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/aide-family/sovereign/cmd/run"
+	"github.com/aide-family/marksman/cmd/run"
 )
 
 type Flags struct {

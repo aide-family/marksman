@@ -14,17 +14,17 @@ import (
 
 	"github.com/aide-family/magicbox/hello"
 	"github.com/aide-family/magicbox/strutil"
-	"github.com/aide-family/sovereign/internal/conf"
-	"github.com/aide-family/sovereign/internal/data"
-	"github.com/aide-family/sovereign/internal/server"
+	"github.com/aide-family/marksman/internal/conf"
+	"github.com/aide-family/marksman/internal/data"
+	"github.com/aide-family/marksman/internal/server"
 )
 
-const cmdRunLong = `Run the Sovereign services`
+const cmdRunLong = `Run the marksman services`
 
 func NewCmd(defaultServerConfigBytes []byte) *cobra.Command {
 	runCmd := &cobra.Command{
 		Use:   "run",
-		Short: "Run the Sovereign services",
+		Short: "Run the marksman services",
 		Long:  cmdRunLong,
 	}
 	var bc conf.Bootstrap
@@ -47,7 +47,7 @@ func NewEndpoint(wireApp WireAppFunc) *endpoint {
 func NewEngine(endpoints ...*endpoint) *Engine {
 	return &Engine{
 		endpoints:   endpoints,
-		beforeFuncs: []func(){hello.Hello},
+		beforeFuncs: []func(...bool){hello.Hello},
 		afterFuncs:  []func(){},
 	}
 }
@@ -65,7 +65,7 @@ type endpoint struct {
 
 type Engine struct {
 	endpoints   []*endpoint
-	beforeFuncs []func()
+	beforeFuncs []func(...bool)
 	afterFuncs  []func()
 }
 
@@ -74,7 +74,7 @@ func (e *Engine) AddAfterFunc(afterFunc func()) *Engine {
 	return e
 }
 
-func (e *Engine) AddBeforeFunc(beforeFunc func()) *Engine {
+func (e *Engine) AddBeforeFunc(beforeFunc func(...bool)) *Engine {
 	e.beforeFuncs = append(e.beforeFuncs, beforeFunc)
 	return e
 }
@@ -88,7 +88,7 @@ func (e *Engine) init() *Engine {
 		hello.WithMetadata(serverConf.GetMetadata()),
 		hello.WithName(serverConf.GetName()),
 	}
-	if strings.EqualFold(serverConf.GetUseRandomID(), "true") {
+	if strings.EqualFold(runFlags.GetUseRandomID(), "true") {
 		envOpts = append(envOpts, hello.WithID(strutil.RandomID()))
 	}
 	hello.SetEnvWithOption(envOpts...)
@@ -177,8 +177,8 @@ func NewApp(serviceName string, d *data.Data, srvs server.Servers, bc *conf.Boot
 			if !ok {
 				panic("server instance is not a *http.Server")
 			}
-			server.BindSwagger(httpSrv, bc, helper)
-			server.BindMetrics(httpSrv, bc, helper)
+			server.BindSwagger(httpSrv, bc)
+			server.BindMetrics(httpSrv, bc)
 		}
 
 		apps = append(apps, kratos.New(opts...))

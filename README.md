@@ -1,4 +1,4 @@
-# Sovereign (太阴星君)
+# marksman (后羿)
 
 <div align="right">
 
@@ -13,9 +13,9 @@
 
 ## 📖 Introduction
 
-Sovereign (太阴星君) is a universal service template project for the Moon platform.
+marksman (后羿) 是作为 moon 体系通用的事件服务项目
 
-## Quick Start
+## 🚀 Quick Start
 
 ```bash
 make init
@@ -27,31 +27,31 @@ make build
 - help
 
 ```bash
-./bin/sovereign -h
+./bin/marksman -h
 ```
 
 - version
 
 ```bash
-./bin/sovereign version
+./bin/marksman version
 ```
 
 - run all
 
 ```bash
-./bin/sovereign run all -h
+./bin/marksman run all -h
 ```
 
 - run grpc
 
 ```bash
-./bin/sovereign run grpc -h
+./bin/marksman run grpc -h
 ```
 
 - run http
 
 ```bash
-./bin/sovereign run http -h
+./bin/marksman run http -h
 ```
 
 ## Development

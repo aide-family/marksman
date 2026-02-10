@@ -5,16 +5,16 @@ import (
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/spf13/cobra"
 
-	"github.com/aide-family/sovereign/cmd"
-	"github.com/aide-family/sovereign/cmd/run"
+	"github.com/aide-family/marksman/cmd"
+	"github.com/aide-family/marksman/cmd/run"
 )
 
-const cmdAllLong = `Start the Sovereign service with all services (HTTP, gRPC)`
+const cmdAllLong = `Start the marksman service with all services (HTTP, gRPC)`
 
 func NewCmd() *cobra.Command {
 	runCmd := &cobra.Command{
 		Use:   "all",
-		Short: "Start the Sovereign service with all services (HTTP, gRPC) and bind Swagger and Metrics",
+		Short: "Start the marksman service with all services (HTTP, gRPC) and bind Swagger and Metrics",
 		Long:  cmdAllLong,
 		Annotations: map[string]string{
 			"group": cmd.ServiceCommands,

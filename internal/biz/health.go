@@ -1,6 +1,6 @@
 package biz
 
-import "github.com/aide-family/sovereign/internal/biz/repository"
+import "github.com/aide-family/marksman/internal/biz/repository"
 
 func NewHealth(healthRepo repository.Health) *Health {
 	return &Health{

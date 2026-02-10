@@ -7,9 +7,10 @@ import (
 	"strings"
 
 	"buf.build/go/protoyaml"
+	"github.com/aide-family/magicbox/domain/auth/basic"
+	"github.com/aide-family/magicbox/oauth"
 	"github.com/go-kratos/kratos/v2/encoding"
 	"github.com/go-kratos/kratos/v2/encoding/json"
-	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
@@ -19,10 +20,10 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/aide-family/sovereign/internal/conf"
-	"github.com/aide-family/sovereign/internal/service"
-	apiv1 "github.com/aide-family/sovereign/pkg/api/v1"
-	"github.com/aide-family/sovereign/pkg/middler"
+	healthv1 "github.com/aide-family/magicbox/api/v1"
+	namespacev1 "github.com/aide-family/magicbox/api/v1"
+	"github.com/aide-family/marksman/internal/conf"
+	"github.com/aide-family/marksman/internal/service"
 )
 
 //go:embed swagger
@@ -115,52 +116,26 @@ func newServer(name string, srv transport.Server) Server {
 
 type Servers []Server
 
-func BindSwagger(httpSrv *http.Server, bc *conf.Bootstrap, helper *klog.Helper) {
-	if !strings.EqualFold(bc.GetEnableSwagger(), "true") {
-		helper.Debug("swagger is not enabled")
-		return
+func BindSwagger(httpSrv *http.Server, bc *conf.Bootstrap) {
+	binding := basic.HandlerBinding{
+		Name:      "Swagger",
+		Enabled:   strings.EqualFold(bc.GetEnableSwagger(), "true"),
+		BasicAuth: bc.GetSwaggerBasicAuth(),
+		Handler:   nethttp.StripPrefix("/doc/", nethttp.FileServer(nethttp.FS(docFS))),
+		Path:      "/doc/",
 	}
-
-	endpoint, err := httpSrv.Endpoint()
-	if err != nil {
-		helper.Errorw("msg", "get http server endpoint failed", "error", err)
-		return
-	}
-
-	// Create file server handler
-	authHandler := nethttp.StripPrefix("/doc/", nethttp.FileServer(nethttp.FS(docFS)))
-	basicAuth := bc.GetSwaggerBasicAuth()
-	if strings.EqualFold(basicAuth.GetEnabled(), "true") {
-		authHandler = middler.BasicAuthMiddleware(basicAuth.GetUsername(), basicAuth.GetPassword())(authHandler)
-		helper.Debugf("[Swagger] endpoint: %s/doc/swagger (Basic Auth: %s:%s)", endpoint, basicAuth.GetUsername(), basicAuth.GetPassword())
-	} else {
-		helper.Debugf("[Swagger] endpoint: %s/doc/swagger (No Basic Auth)", endpoint)
-	}
-
-	httpSrv.HandlePrefix("/doc/", authHandler)
+	basic.BindHandlerWithAuth(httpSrv, binding)
 }
 
-func BindMetrics(httpSrv *http.Server, bc *conf.Bootstrap, helper *klog.Helper) {
-	if !strings.EqualFold(bc.GetEnableMetrics(), "true") {
-		helper.Debug("metrics is not enabled")
-		return
+func BindMetrics(httpSrv *http.Server, bc *conf.Bootstrap) {
+	binding := basic.HandlerBinding{
+		Name:      "Metrics",
+		Enabled:   strings.EqualFold(bc.GetEnableMetrics(), "true"),
+		BasicAuth: bc.GetMetricsBasicAuth(),
+		Handler:   promhttp.Handler(),
+		Path:      "/metrics",
 	}
-
-	endpoint, err := httpSrv.Endpoint()
-	if err != nil {
-		helper.Errorw("msg", "get http server endpoint failed", "error", err)
-		return
-	}
-
-	basicAuth := bc.GetMetricsBasicAuth()
-	authHandler := promhttp.Handler()
-	if strings.EqualFold(basicAuth.GetEnabled(), "true") {
-		authHandler = middler.BasicAuthMiddleware(basicAuth.GetUsername(), basicAuth.GetPassword())(authHandler)
-		helper.Debugf("[Metrics] endpoint: %s/metrics (Basic Auth: %s:%s)", endpoint, basicAuth.GetUsername(), basicAuth.GetPassword())
-	} else {
-		helper.Debugf("[Metrics] endpoint: %s/metrics (No Basic Auth)", endpoint)
-	}
-	httpSrv.Handle("/metrics", authHandler)
+	basic.BindHandlerWithAuth(httpSrv, binding)
 }
 
 // RegisterService registers the service.
@@ -168,19 +143,18 @@ func RegisterService(
 	c *conf.Bootstrap,
 	httpSrv *http.Server,
 	grpcSrv *grpc.Server,
+	authService *service.AuthService,
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
 ) Servers {
 	var srvs Servers
 
 	srvs = append(srvs, RegisterHTTPService(c, httpSrv,
+		authService,
 		healthService,
 		namespaceService,
 	)...)
-	srvs = append(srvs, RegisterGRPCService(c, grpcSrv,
-		healthService,
-		namespaceService,
-	)...)
+	srvs = append(srvs, RegisterGRPCService(c, grpcSrv, healthService, namespaceService)...)
 	return srvs
 }
 
@@ -188,11 +162,17 @@ func RegisterService(
 func RegisterHTTPService(
 	c *conf.Bootstrap,
 	httpSrv *http.Server,
+	authService *service.AuthService,
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
 ) Servers {
-	apiv1.RegisterHealthHTTPServer(httpSrv, healthService)
-	apiv1.RegisterNamespaceHTTPServer(httpSrv, namespaceService)
+	healthv1.RegisterHealthHTTPServer(httpSrv, healthService)
+	namespacev1.RegisterNamespaceHTTPServer(httpSrv, namespaceService)
+
+	oauth2Handler := oauth.NewOAuth2Handler(c.GetOauth2(), authService.Login)
+	if err := oauth2Handler.Handler(httpSrv); err != nil {
+		panic(err)
+	}
 	return Servers{newServer("http", httpSrv)}
 }
 
@@ -203,21 +183,23 @@ func RegisterGRPCService(
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
 ) Servers {
-	apiv1.RegisterHealthServer(grpcSrv, healthService)
-	apiv1.RegisterNamespaceServer(grpcSrv, namespaceService)
+	healthv1.RegisterHealthServer(grpcSrv, healthService)
+	namespacev1.RegisterNamespaceServer(grpcSrv, namespaceService)
 	return Servers{newServer("grpc", grpcSrv)}
 }
 
 var namespaceAllowList = []string{
-	apiv1.OperationNamespaceCreateNamespace,
-	apiv1.OperationNamespaceUpdateNamespace,
-	apiv1.OperationNamespaceUpdateNamespaceStatus,
-	apiv1.OperationNamespaceDeleteNamespace,
-	apiv1.OperationNamespaceGetNamespace,
-	apiv1.OperationNamespaceListNamespace,
-	apiv1.OperationHealthHealthCheck,
+	namespacev1.OperationNamespaceCreateNamespace,
+	namespacev1.OperationNamespaceUpdateNamespace,
+	namespacev1.OperationNamespaceUpdateNamespaceStatus,
+	namespacev1.OperationNamespaceDeleteNamespace,
+	namespacev1.OperationNamespaceGetNamespace,
+	namespacev1.OperationNamespaceListNamespace,
 }
 
 var authAllowList = []string{
-	apiv1.OperationHealthHealthCheck,
+	healthv1.OperationHealthHealthCheck,
+	oauth.OperationOAuth2Reports,
+	oauth.OperationOAuth2Login,
+	oauth.OperationOAuth2Callback,
 }

@@ -3,22 +3,28 @@ syntax = "proto3";
 package internal.conf;
 
 import "google/protobuf/duration.proto";
-import "config/config.proto";
-import "enum/enum.proto";
+import "magicbox/config/config.proto";
+import "magicbox/enum/enum.proto";
 
-option go_package = "github.com/aide-family/sovereign/internal/conf;conf";
+option go_package = "github.com/aide-family/marksman/internal/conf;conf";
 
 message Bootstrap {
-	sovereign.enum.Environment environment = 1;
-	Server server = 2;
-	JWT jwt = 3;
-	sovereign.config.BasicAuthConfig swaggerBasicAuth = 4;
-	sovereign.config.BasicAuthConfig metricsBasicAuth = 5;
-	string enableSwagger = 6;
-	string enableMetrics = 7;
-	string enableClientConfig = 8;
-	sovereign.config.ReportConfig report = 9;
-	sovereign.config.NamespaceConfig namespaceConfig = 10;
+	magicbox.enum.Environment environment = 1;
+	string useRandomID = 2;
+	Server server = 3;
+	magicbox.config.JWT jwt = 4;
+	magicbox.config.BasicAuthConfig swaggerBasicAuth = 5;
+	magicbox.config.BasicAuthConfig metricsBasicAuth = 6;
+	string enableSwagger = 7;
+	string enableMetrics = 8;
+	string enableClientConfig = 9;
+	magicbox.config.ReportConfig report = 10;
+	magicbox.config.OAuth2 oauth2 = 11;
+	magicbox.config.DomainConfig namespaceConfig = 12;
+	magicbox.config.DomainConfig loginConfig = 13;
+	magicbox.config.ClusterConfig jobClusters = 14;
+	JobCore jobCore = 15;
+	magicbox.config.ORMConfig database = 16;
 }
 
 message Server {
@@ -26,19 +32,18 @@ message Server {
 		string address = 1;
 		string network = 2;
 		google.protobuf.Duration timeout = 3;
-		sovereign.config.ClusterConfig.Protocol protocol = 4;
+		magicbox.config.Protocol protocol = 4;
 	}
 	
 	string name = 1;
-	string namespace = 2;
-	map<string, string> metadata = 3;
-	ServerConfig http = 4;
-	ServerConfig grpc = 5;
-	string useRandomID = 6;
+	map<string, string> metadata = 2;
+	ServerConfig http = 3;
+	ServerConfig grpc = 4;
+	ServerConfig job = 5;
 }
 
-message JWT {
-	string secret = 1;
-	google.protobuf.Duration expire = 2;
-	string issuer = 3;
+message JobCore {
+	int32 workerTotal = 1;
+	google.protobuf.Duration timeout = 2;
+	uint32 bufferSize = 3;
 }
