@@ -7,5 +7,6 @@ var ProviderSetBiz = wire.NewSet(
 	NewHealth,
 	NewNamespace,
 	NewLevel,
+	NewDatasource,
 	NewLoginBiz,
 )

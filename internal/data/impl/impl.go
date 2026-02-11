@@ -8,5 +8,6 @@ var ProviderSetImpl = wire.NewSet(
 	NewHealthRepository,
 	NewNamespaceRepository,
 	NewLevelRepository,
+	NewDatasourceRepository,
 	NewLoginRepository,
 )

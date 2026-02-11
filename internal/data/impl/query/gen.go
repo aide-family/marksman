@@ -16,34 +16,39 @@ import (
 )
 
 var (
-	Q     = new(Query)
-	Level *level
+	Q          = new(Query)
+	Datasource *datasource
+	Level      *level
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
+	Datasource = &Q.Datasource
 	Level = &Q.Level
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:    db,
-		Level: newLevel(db, opts...),
+		db:         db,
+		Datasource: newDatasource(db, opts...),
+		Level:      newLevel(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Level level
+	Datasource datasource
+	Level      level
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:    db,
-		Level: q.Level.clone(db),
+		db:         db,
+		Datasource: q.Datasource.clone(db),
+		Level:      q.Level.clone(db),
 	}
 }
 
@@ -57,18 +62,21 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:    db,
-		Level: q.Level.replaceDB(db),
+		db:         db,
+		Datasource: q.Datasource.replaceDB(db),
+		Level:      q.Level.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Level ILevelDo
+	Datasource IDatasourceDo
+	Level      ILevelDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Level: q.Level.WithContext(ctx),
+		Datasource: q.Datasource.WithContext(ctx),
+		Level:      q.Level.WithContext(ctx),
 	}
 }
 

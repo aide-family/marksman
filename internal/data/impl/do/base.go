@@ -13,6 +13,7 @@ import (
 func Models() []any {
 	return []any{
 		&Level{},
+		&Datasource{},
 	}
 }
 

@@ -1166,7 +1166,7 @@ components:
                 status:
                     type: integer
                     format: enum
-                datasources:
+                datasourceUIDs:
                     type: array
                     items:
                         type: string

@@ -147,6 +147,7 @@ func RegisterService(
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
 	levelService *service.LevelService,
+	datasourceService *service.DatasourceService,
 ) Servers {
 	var srvs Servers
 
@@ -155,8 +156,9 @@ func RegisterService(
 		healthService,
 		namespaceService,
 		levelService,
+		datasourceService,
 	)...)
-	srvs = append(srvs, RegisterGRPCService(c, grpcSrv, healthService, namespaceService, levelService)...)
+	srvs = append(srvs, RegisterGRPCService(c, grpcSrv, healthService, namespaceService, levelService, datasourceService)...)
 	return srvs
 }
 
@@ -168,10 +170,12 @@ func RegisterHTTPService(
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
 	levelService *service.LevelService,
+	datasourceService *service.DatasourceService,
 ) Servers {
 	magicboxapiv1.RegisterHealthHTTPServer(httpSrv, healthService)
 	magicboxapiv1.RegisterNamespaceHTTPServer(httpSrv, namespaceService)
 	apiv1.RegisterLevelHTTPServer(httpSrv, levelService)
+	apiv1.RegisterDatasourceHTTPServer(httpSrv, datasourceService)
 
 	oauth2Handler := oauth.NewOAuth2Handler(c.GetOauth2(), authService.Login)
 	if err := oauth2Handler.Handler(httpSrv); err != nil {
@@ -187,10 +191,12 @@ func RegisterGRPCService(
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
 	levelService *service.LevelService,
+	datasourceService *service.DatasourceService,
 ) Servers {
 	magicboxapiv1.RegisterHealthServer(grpcSrv, healthService)
 	magicboxapiv1.RegisterNamespaceServer(grpcSrv, namespaceService)
 	apiv1.RegisterLevelServer(grpcSrv, levelService)
+	apiv1.RegisterDatasourceServer(grpcSrv, datasourceService)
 	return Servers{newServer("grpc", grpcSrv)}
 }
 
@@ -201,6 +207,18 @@ var namespaceAllowList = []string{
 	magicboxapiv1.OperationNamespaceDeleteNamespace,
 	magicboxapiv1.OperationNamespaceGetNamespace,
 	magicboxapiv1.OperationNamespaceListNamespace,
+	apiv1.OperationLevelCreateLevel,
+	apiv1.OperationLevelUpdateLevel,
+	apiv1.OperationLevelUpdateLevelStatus,
+	apiv1.OperationLevelDeleteLevel,
+	apiv1.OperationLevelGetLevel,
+	apiv1.OperationLevelListLevel,
+	apiv1.OperationLevelSelectLevel,
+	apiv1.OperationDatasourceCreateDatasource,
+	apiv1.OperationDatasourceUpdateDatasource,
+	apiv1.OperationDatasourceDeleteDatasource,
+	apiv1.OperationDatasourceGetDatasource,
+	apiv1.OperationDatasourceListDatasource,
 }
 
 var authAllowList = []string{
