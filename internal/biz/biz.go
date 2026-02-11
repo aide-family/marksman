@@ -6,5 +6,6 @@ import "github.com/google/wire"
 var ProviderSetBiz = wire.NewSet(
 	NewHealth,
 	NewNamespace,
+	NewLevel,
 	NewLoginBiz,
 )

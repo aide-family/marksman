@@ -70,7 +70,6 @@ wire:
 all:
 	@git log -1 --format='%B' > description.txt
 	git submodule update --init --recursive
-	@(cd pkg/magicbox && git clean -fd && git submodule foreach --recursive 'git clean -fd'; test -f proto/.git 2>/dev/null && rm -rf proto) 2>/dev/null || true
 	git submodule update --remote --recursive
 	make api conf wire
 

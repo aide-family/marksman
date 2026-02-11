@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"buf.build/go/protoyaml"
+	magicboxapiv1 "github.com/aide-family/magicbox/api/v1"
 	"github.com/aide-family/magicbox/domain/auth/basic"
 	"github.com/aide-family/magicbox/oauth"
 	"github.com/go-kratos/kratos/v2/encoding"
@@ -20,10 +21,9 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	healthv1 "github.com/aide-family/magicbox/api/v1"
-	namespacev1 "github.com/aide-family/magicbox/api/v1"
 	"github.com/aide-family/marksman/internal/conf"
 	"github.com/aide-family/marksman/internal/service"
+	apiv1 "github.com/aide-family/marksman/pkg/api/v1"
 )
 
 //go:embed swagger
@@ -146,6 +146,7 @@ func RegisterService(
 	authService *service.AuthService,
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
+	levelService *service.LevelService,
 ) Servers {
 	var srvs Servers
 
@@ -153,8 +154,9 @@ func RegisterService(
 		authService,
 		healthService,
 		namespaceService,
+		levelService,
 	)...)
-	srvs = append(srvs, RegisterGRPCService(c, grpcSrv, healthService, namespaceService)...)
+	srvs = append(srvs, RegisterGRPCService(c, grpcSrv, healthService, namespaceService, levelService)...)
 	return srvs
 }
 
@@ -165,9 +167,11 @@ func RegisterHTTPService(
 	authService *service.AuthService,
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
+	levelService *service.LevelService,
 ) Servers {
-	healthv1.RegisterHealthHTTPServer(httpSrv, healthService)
-	namespacev1.RegisterNamespaceHTTPServer(httpSrv, namespaceService)
+	magicboxapiv1.RegisterHealthHTTPServer(httpSrv, healthService)
+	magicboxapiv1.RegisterNamespaceHTTPServer(httpSrv, namespaceService)
+	apiv1.RegisterLevelHTTPServer(httpSrv, levelService)
 
 	oauth2Handler := oauth.NewOAuth2Handler(c.GetOauth2(), authService.Login)
 	if err := oauth2Handler.Handler(httpSrv); err != nil {
@@ -182,23 +186,25 @@ func RegisterGRPCService(
 	grpcSrv *grpc.Server,
 	healthService *service.HealthService,
 	namespaceService *service.NamespaceService,
+	levelService *service.LevelService,
 ) Servers {
-	healthv1.RegisterHealthServer(grpcSrv, healthService)
-	namespacev1.RegisterNamespaceServer(grpcSrv, namespaceService)
+	magicboxapiv1.RegisterHealthServer(grpcSrv, healthService)
+	magicboxapiv1.RegisterNamespaceServer(grpcSrv, namespaceService)
+	apiv1.RegisterLevelServer(grpcSrv, levelService)
 	return Servers{newServer("grpc", grpcSrv)}
 }
 
 var namespaceAllowList = []string{
-	namespacev1.OperationNamespaceCreateNamespace,
-	namespacev1.OperationNamespaceUpdateNamespace,
-	namespacev1.OperationNamespaceUpdateNamespaceStatus,
-	namespacev1.OperationNamespaceDeleteNamespace,
-	namespacev1.OperationNamespaceGetNamespace,
-	namespacev1.OperationNamespaceListNamespace,
+	magicboxapiv1.OperationNamespaceCreateNamespace,
+	magicboxapiv1.OperationNamespaceUpdateNamespace,
+	magicboxapiv1.OperationNamespaceUpdateNamespaceStatus,
+	magicboxapiv1.OperationNamespaceDeleteNamespace,
+	magicboxapiv1.OperationNamespaceGetNamespace,
+	magicboxapiv1.OperationNamespaceListNamespace,
 }
 
 var authAllowList = []string{
-	healthv1.OperationHealthHealthCheck,
+	magicboxapiv1.OperationHealthHealthCheck,
 	oauth.OperationOAuth2Reports,
 	oauth.OperationOAuth2Login,
 	oauth.OperationOAuth2Callback,
